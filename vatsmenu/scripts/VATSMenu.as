@@ -5,11 +5,15 @@ package
    import Shared.AS3.Data.BSUIDataManager;
    import Shared.AS3.Data.FromClientDataEvent;
    import Shared.AS3.IMenu;
+   import flash.display.Loader;
    import flash.display.MovieClip;
    import flash.display.StageAlign;
+   import flash.events.*;
    import flash.geom.Point;
    import flash.geom.Rectangle;
    import flash.geom.Vector3D;
+   import flash.net.*;
+   import flash.system.*;
    import flash.text.TextFieldAutoSize;
    
    [Embed(source="/_assets/assets.swf", symbol="symbol91")]
@@ -71,8 +75,13 @@ package
       
       private var m_ScreenRatio:Number = 1;
       
+      private var modLoader:Loader;
+      
       public function VATSMenu()
       {
+         this.PartSelectDistanceWeight = 0.3;
+         this.PartSelectDistanceWeight = 0.3;
+         this.PartSelectDistanceWeight = 0.3;
          this.ResistanceData = new Array();
          this.CancelButton = new BSButtonHintData("$RETURN","Tab","PSN_B","Xenon_B",1,this.onCancelButtonClick);
          this.BodyPartButton = new BSButtonHintData("$PART","Mousewheel","PSN_RS","Xenon_RS",1,this.onBodyPartButtonClick);
@@ -99,6 +108,27 @@ package
          this.ButtonDataA.push(this.CancelPlaybackButton);
          this.ButtonHintInstance.SetButtonHintData(this.ButtonDataA);
          BSUIDataManager.Subscribe("ScreenResolutionData",this.onScreenDataUpdate);
+         this.loadMod("VatsPriority.swf");
+      }
+      
+      private function loadMod(param1:String) : void
+      {
+         try
+         {
+            modLoader = new Loader();
+            modLoader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,this.uncaughtErrorHandler);
+            modLoader.load(new URLRequest(param1),new LoaderContext(false,ApplicationDomain.currentDomain));
+            addChild(modLoader);
+         }
+         catch(e:Error)
+         {
+            GlobalFunc.ShowHUDMessage("Error loading mod: " + e);
+         }
+      }
+      
+      private function uncaughtErrorHandler(param1:UncaughtErrorEvent) : void
+      {
+         GlobalFunc.ShowHUDMessage("Error loading mod: " + param1);
       }
       
       private function onScreenDataUpdate(param1:FromClientDataEvent) : void
@@ -343,6 +373,7 @@ package
          {
             this.swapChildren(this.getChildAt(this.numChildren - 1),this.PartInfos[_loc2_]);
          }
+         stage.dispatchEvent(new Event("VatsPriority::RefreshActionDisplay"));
       }
       
       public function ShowPlaybackButtons() : *
