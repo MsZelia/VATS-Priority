@@ -185,7 +185,7 @@ package
             return;
          }
          displayMessage("RefreshActionDisplay");
-         setTimeout(this.setPriority,config.delayRefresh);
+         setTimeout(this.setPriority,20);
       }
       
       public function onTargetChanged(event:Event) : void
@@ -195,7 +195,7 @@ package
             return;
          }
          displayMessage("TargetChanged");
-         setTimeout(this.setPriority,config.delayRefresh);
+         setTimeout(this.setPriority,20);
       }
       
       public function setPriority() : void
