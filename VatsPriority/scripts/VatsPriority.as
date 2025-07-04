@@ -30,6 +30,8 @@ package
       public static const CONFIG_FILE:String = "../VatsPriority.json";
       
       public static var DEBUG:Boolean = false;
+      
+      public static var PRIORITY_NO_TARGET_CHECK:Boolean = true;
        
       
       private var topLevel:*;
@@ -65,9 +67,12 @@ package
          this.debug_tf.x = 20;
          this.debug_tf.y = 20;
          this.debug_tf.width = 700;
-         this.debug_tf.height = 700;
+         this.debug_tf.height = 660;
          GlobalFunc.SetText(this.debug_tf,"",false);
-         this.debug_tf.autoSize = TextFieldAutoSize.LEFT;
+         if(false)
+         {
+            this.debug_tf.autoSize = TextFieldAutoSize.LEFT;
+         }
          this.debug_tf.wordWrap = true;
          this.debug_tf.multiline = true;
          var font:TextFormat = new TextFormat("$MAIN_Font",12,16777215);
@@ -82,6 +87,10 @@ package
       
       public function displayMessage(param1:*, clear:Boolean = false) : void
       {
+         if(!DEBUG)
+         {
+            return;
+         }
          if(clear)
          {
             this.debug_tf.text = "";
@@ -126,7 +135,7 @@ package
                   }
                   displayMessage("Config file loaded!");
                   displayMessage(toString(config));
-                  initTarget();
+                  setPriority();
                }
                catch(e:Error)
                {
@@ -152,9 +161,12 @@ package
             this.topLevel = this.topLevel.numChildren > 0 ? this.topLevel.getChildAt(0) : null;
             if(Boolean(this.topLevel))
             {
-               stage.addEventListener("VatsPriority::RefreshActionDisplay",this.onRefreshActionDisplay);
+               if(false)
+               {
+                  stage.addEventListener("VatsPriority::RefreshActionDisplay",this.onRefreshActionDisplay);
+               }
+               stage.addEventListener("VatsPriority::UpdateTargetInfo",this.onTargetChanged);
                trace(MOD_NAME + " added to VATSMenu: " + getQualifiedClassName(this.topLevel));
-               displayMessage(MOD_NAME + " added to VATSMenu: " + getQualifiedClassName(this.topLevel));
             }
             else
             {
@@ -175,16 +187,26 @@ package
          {
             return;
          }
-         setTimeout(this.initTarget,config.delayRefresh);
+         displayMessage("RefreshActionDisplay");
+         setTimeout(this.setPriority,config.delayRefresh);
       }
       
-      public function initTarget() : void
+      public function onTargetChanged(event:Event) : void
+      {
+         if(!config)
+         {
+            return;
+         }
+         displayMessage("TargetChanged");
+         setTimeout(this.setPriority,config.delayRefresh);
+      }
+      
+      public function setPriority() : void
       {
          if(!this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
          {
             return;
          }
-         displayMessage("selectedPart: " + this.topLevel.SelectedPart);
          displayMessage("Parts: " + this.topLevel.PartInfos.length);
          var parts:Array = [];
          for(part in this.topLevel.PartInfos)
@@ -194,14 +216,13 @@ package
          }
          var targetName:String = "".toUpperCase();
          var foundTarget:Boolean = false;
-         var PRIO_LEGACY:Boolean = true;
-         if(PRIO_LEGACY)
+         for(prio in config.priorities)
          {
-            for(prio in config.priorities)
+            if(config.priorities[prio] != null)
             {
-               if(config.priorities[prio] != null)
+               prioLookup = prio.toUpperCase();
+               if(PRIORITY_NO_TARGET_CHECK || targetName.indexOf(prioLookup) != -1)
                {
-                  var prioLookup:String = prio.toUpperCase();
                   for(part in parts)
                   {
                      if(parts[part].indexOf(config.priorities[prio]) != -1)
@@ -215,33 +236,6 @@ package
                   if(foundTarget)
                   {
                      break;
-                  }
-               }
-            }
-         }
-         else
-         {
-            for(prio in config.priorities)
-            {
-               if(config.priorities[prio] != null)
-               {
-                  prioLookup = prio.toUpperCase();
-                  if(targetName.indexOf(prioLookup) != -1)
-                  {
-                     for(part in parts)
-                     {
-                        if(parts[part].indexOf(config.priorities[prio]) != -1)
-                        {
-                           displayMessage("Found target " + prioLookup + ", selecting part " + part + ": " + parts[part]);
-                           this.topLevel.BGSCodeObj.SelectPart(part);
-                           foundTarget = true;
-                           break;
-                        }
-                     }
-                     if(foundTarget)
-                     {
-                        break;
-                     }
                   }
                }
             }

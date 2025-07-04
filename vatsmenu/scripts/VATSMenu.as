@@ -130,6 +130,14 @@ package
          GlobalFunc.ShowHUDMessage("Error loading mod: " + param1);
       }
       
+      private function displayMessage(message:String) : void
+      {
+         if(modLoader && modLoader.content)
+         {
+            modLoader.content.displayMessage(message);
+         }
+      }
+      
       private function onScreenDataUpdate(param1:FromClientDataEvent) : void
       {
          if(param1.data && param1.data.AspectRatio != "16:9" || param1.data && param1.data.AspectRatio != "16:10")
@@ -495,6 +503,7 @@ package
          this.ResistancesInstance.x = this.STAGE_WIDTH / 2 - this.ResistancesInstance.width / 2;
          this.ResistanceBracketsInstance.width = this.ResistancesInstance.width;
          this.UpdateButtonVisibility();
+         stage.dispatchEvent(new Event("VatsPriority::UpdateTargetInfo"));
       }
       
       public function SetTargetLevel(param1:uint, param2:uint, param3:Boolean) : *
