@@ -5,6 +5,7 @@ package
    import Shared.AS3.Data.BSUIDataManager;
    import Shared.AS3.Data.FromClientDataEvent;
    import Shared.AS3.IMenu;
+   import Shared.GlobalFunc;
    import flash.display.Loader;
    import flash.display.MovieClip;
    import flash.display.StageAlign;
@@ -79,8 +80,6 @@ package
       
       public function VATSMenu()
       {
-         this.PartSelectDistanceWeight = 0.3;
-         this.PartSelectDistanceWeight = 0.3;
          this.PartSelectDistanceWeight = 0.3;
          this.ResistanceData = new Array();
          this.CancelButton = new BSButtonHintData("$RETURN","Tab","PSN_B","Xenon_B",1,this.onCancelButtonClick);
