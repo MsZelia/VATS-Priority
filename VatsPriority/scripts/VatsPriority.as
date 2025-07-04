@@ -44,7 +44,6 @@ package
       
       public function VatsPriority()
       {
-         this.config = {};
          super();
          this.createDebugTf();
          this.loadConfig();
@@ -122,6 +121,7 @@ package
                   config = new JSONDecoder(loader.data,true).getValue();
                   DEBUG = config.debug;
                   config.defaultPriority = config.defaultPriority != null ? config.defaultPriority.toUpperCase() : "HEAD";
+                  config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
                   if(config.priorities == null)
                   {
                      config.priorities = {};
@@ -161,10 +161,7 @@ package
             this.topLevel = this.topLevel.numChildren > 0 ? this.topLevel.getChildAt(0) : null;
             if(Boolean(this.topLevel))
             {
-               if(false)
-               {
-                  stage.addEventListener("VatsPriority::RefreshActionDisplay",this.onRefreshActionDisplay);
-               }
+               stage.addEventListener("VatsPriority::RefreshActionDisplay",this.onRefreshActionDisplay);
                stage.addEventListener("VatsPriority::UpdateTargetInfo",this.onTargetChanged);
                trace(MOD_NAME + " added to VATSMenu: " + getQualifiedClassName(this.topLevel));
             }
@@ -183,7 +180,7 @@ package
       
       public function onRefreshActionDisplay(event:Event) : void
       {
-         if(!config)
+         if(!config || !config.lockPriorityTarget)
          {
             return;
          }
@@ -237,6 +234,18 @@ package
                   {
                      break;
                   }
+               }
+            }
+         }
+         if(!foundTarget)
+         {
+            for(part in parts)
+            {
+               if(parts[part].indexOf(config.defaultPriority) != -1)
+               {
+                  displayMessage("Default priority, selecting part " + part + ": " + parts[part]);
+                  this.topLevel.BGSCodeObj.SelectPart(part);
+                  break;
                }
             }
          }
