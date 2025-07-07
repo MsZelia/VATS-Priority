@@ -29,7 +29,7 @@ package
       
       public static const CONFIG_FILE:String = "../VatsPriority.json";
       
-      public static var DEBUG:Boolean = false;
+      public static var DEBUG:int = 0;
       
       public static var PRIORITY_NO_TARGET_CHECK:Boolean = true;
        
@@ -68,10 +68,6 @@ package
          this.debug_tf.width = 700;
          this.debug_tf.height = 660;
          GlobalFunc.SetText(this.debug_tf,"",false);
-         if(false)
-         {
-            this.debug_tf.autoSize = TextFieldAutoSize.LEFT;
-         }
          this.debug_tf.wordWrap = true;
          this.debug_tf.multiline = true;
          var font:TextFormat = new TextFormat("$MAIN_Font",12,16777215);
@@ -84,9 +80,9 @@ package
          addChild(this.debug_tf);
       }
       
-      public function displayMessage(param1:*, clear:Boolean = false) : void
+      public function displayMessage(param1:*, debugLevel:int = 1, clear:Boolean = false) : void
       {
-         if(!DEBUG)
+         if(DEBUG < debugLevel)
          {
             return;
          }
@@ -133,13 +129,13 @@ package
                         config.priorities[prio] = config.priorities[prio].toUpperCase();
                      }
                   }
-                  displayMessage("Config file loaded!");
-                  displayMessage(toString(config));
+                  displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
+                  displayMessage(toString(config),2);
                   setPriority();
                }
                catch(e:Error)
                {
-                  ShowHUDMessage("Error parsing config: " + e);
+                  displayMessage(FULL_MOD_NAME + " | Error parsing config: " + e,0);
                }
             };
             url = new URLRequest(CONFIG_FILE);
@@ -149,7 +145,7 @@ package
          }
          catch(e:Error)
          {
-            ShowHUDMessage("Error loading config: " + e);
+            displayMessage(FULL_MOD_NAME + " | Error loading config: " + e,0);
          }
       }
       
@@ -168,13 +164,13 @@ package
             else
             {
                trace(MOD_NAME + " not added to VATSMenu");
-               displayMessage(MOD_NAME + " not added to VATSMenu");
+               displayMessage(MOD_NAME + " not added to VATSMenu",0);
             }
          }
          else
          {
             trace(MOD_NAME + " not added to stage");
-            displayMessage(MOD_NAME + " not added to stage");
+            displayMessage(MOD_NAME + " not added to stage",0);
          }
       }
       
@@ -184,7 +180,7 @@ package
          {
             return;
          }
-         displayMessage("RefreshActionDisplay");
+         displayMessage("RefreshActionDisplay",2);
          setTimeout(this.setPriority,20);
       }
       
@@ -194,7 +190,7 @@ package
          {
             return;
          }
-         displayMessage("TargetChanged");
+         displayMessage("TargetChanged",2);
          setTimeout(this.setPriority,20);
       }
       
@@ -204,12 +200,12 @@ package
          {
             return;
          }
-         displayMessage("Parts: " + this.topLevel.PartInfos.length);
+         displayMessage("Parts: " + this.topLevel.PartInfos.length,2);
          var parts:Array = [];
          for(part in this.topLevel.PartInfos)
          {
             parts.push(this.topLevel.PartInfos[part].NameTextField.text.toUpperCase());
-            displayMessage(parts[part] + (this.topLevel.SelectedPart == part ? " [S]" : ""));
+            displayMessage(parts[part] + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
          }
          var targetName:String = "".toUpperCase();
          var foundTarget:Boolean = false;
@@ -224,7 +220,7 @@ package
                   {
                      if(parts[part].indexOf(config.priorities[prio]) != -1)
                      {
-                        displayMessage("Found target " + prioLookup + ", selecting part " + part + ": " + parts[part]);
+                        displayMessage("Found target " + prioLookup + ", selecting part " + part + ": " + parts[part],1);
                         this.topLevel.BGSCodeObj.SelectPart(part);
                         foundTarget = true;
                         break;
@@ -243,7 +239,7 @@ package
             {
                if(parts[part].indexOf(config.defaultPriority) != -1)
                {
-                  displayMessage("Default priority, selecting part " + part + ": " + parts[part]);
+                  displayMessage("Default priority, selecting part " + part + ": " + parts[part],1);
                   this.topLevel.BGSCodeObj.SelectPart(part);
                   break;
                }
