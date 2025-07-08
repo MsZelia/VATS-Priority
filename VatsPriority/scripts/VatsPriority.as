@@ -142,11 +142,17 @@ package
             loader = new URLLoader();
             loader.load(url);
             loader.addEventListener(Event.COMPLETE,loaderComplete);
+            loader.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
          }
          catch(e:Error)
          {
             displayMessage(FULL_MOD_NAME + " | Error loading config: " + e,0);
          }
+      }
+      
+      private function ioErrorHandler(event:IOErrorEvent) : void
+      {
+         displayMessage(FULL_MOD_NAME + " | Error loading config :: " + event.text,0);
       }
       
       public function addedToStageHandler(param1:Event) : *
