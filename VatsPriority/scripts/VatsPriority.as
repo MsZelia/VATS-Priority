@@ -27,7 +27,7 @@ package
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
-      public static const CONFIG_FILE:String = "../VatsPriority.json";
+      public static const CONFIG_FILE:String = "../VatsPriorityConfig.json";
       
       public static var DEBUG:int = 0;
       
