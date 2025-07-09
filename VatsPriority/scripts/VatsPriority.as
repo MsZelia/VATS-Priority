@@ -187,7 +187,7 @@ package
             return;
          }
          displayMessage("RefreshActionDisplay",2);
-         setTimeout(this.setPriority,20);
+         setTimeout(this.setPriority,20,false);
       }
       
       public function onTargetChanged(event:Event) : void
@@ -200,18 +200,24 @@ package
          setTimeout(this.setPriority,20);
       }
       
-      public function setPriority() : void
+      public function setPriority(logMsg:Boolean = true) : void
       {
          if(!this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
          {
             return;
          }
-         displayMessage("Parts: " + this.topLevel.PartInfos.length,2);
+         if(logMsg)
+         {
+            displayMessage("Parts: " + this.topLevel.PartInfos.length,2);
+         }
          var parts:Array = [];
          for(part in this.topLevel.PartInfos)
          {
             parts.push(this.topLevel.PartInfos[part].NameTextField.text.toUpperCase());
-            displayMessage(parts[part] + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
+            if(logMsg)
+            {
+               displayMessage(parts[part] + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
+            }
          }
          var targetName:String = "".toUpperCase();
          var foundTarget:Boolean = false;
@@ -226,7 +232,10 @@ package
                   {
                      if(parts[part].indexOf(config.priorities[prio]) != -1)
                      {
-                        displayMessage("Found target " + prioLookup + ", selecting part " + part + ": " + parts[part],1);
+                        if(logMsg)
+                        {
+                           displayMessage("Found target " + prioLookup + ", selecting part " + part + ": " + parts[part],1);
+                        }
                         this.topLevel.BGSCodeObj.SelectPart(part);
                         foundTarget = true;
                         break;
@@ -245,7 +254,10 @@ package
             {
                if(parts[part].indexOf(config.defaultPriority) != -1)
                {
-                  displayMessage("Default priority, selecting part " + part + ": " + parts[part],1);
+                  if(logMsg)
+                  {
+                     displayMessage("Default priority, selecting part " + part + ": " + parts[part],1);
+                  }
                   this.topLevel.BGSCodeObj.SelectPart(part);
                   break;
                }
