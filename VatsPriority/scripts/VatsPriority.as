@@ -21,13 +21,13 @@ package
    public class VatsPriority extends MovieClip
    {
       
-      public static const MOD_NAME:String = "VatsPriority";
+      public static const MOD_NAME:String = "VATSPriority";
       
       public static const MOD_VERSION:String = "1.0.0";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
-      public static const CONFIG_FILE:String = "../VatsPriorityConfig.json";
+      public static const CONFIG_FILE:String = "../VATSPriorityConfig.json";
       
       public static var DEBUG:int = 0;
       
