@@ -123,7 +123,7 @@ package
                try
                {
                   config = new JSONDecoder(loader.data,true).getValue();
-                  DEBUG = config.debug;
+                  DEBUG = isHUDMenu ? 0 : config.debug;
                   config.defaultPriority = config.defaultPriority != null ? config.defaultPriority.toUpperCase() : "HEAD";
                   config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
                   if(config.priorities == null)
@@ -173,6 +173,7 @@ package
             {
                this.debug_tf.x = 400;
                this.isHUDMenu = true;
+               DEBUG = 0;
                this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
                displayMessage("hudTools registered",2);
                this.initTargetTimer();
