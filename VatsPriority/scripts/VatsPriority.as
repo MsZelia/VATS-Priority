@@ -23,15 +23,15 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.0.0";
+      public static const MOD_VERSION:String = "1.0.1";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
       public static const CONFIG_FILE:String = "../VATSPriorityConfig.json";
       
-      public static var DEBUG:int = 0;
+      public static const HUD_TOOLS_SENDER_NAME:String = MOD_NAME + "_HUD";
       
-      public static var PRIORITY_NO_TARGET_CHECK:Boolean = true;
+      public static var DEBUG:int = 1;
        
       
       private var topLevel:*;
@@ -41,6 +41,14 @@ package
       private var lastConfig:String;
       
       private var config:Object;
+      
+      private var isHUDMenu:Boolean = false;
+      
+      private var hudTools:SharedHUDTools;
+      
+      private var targetName:String = "";
+      
+      private var targetTimer:Timer;
       
       public function VatsPriority()
       {
@@ -160,23 +168,98 @@ package
          this.topLevel = stage.getChildAt(0);
          if(Boolean(this.topLevel))
          {
-            this.topLevel = this.topLevel.numChildren > 0 ? this.topLevel.getChildAt(0) : null;
-            if(Boolean(this.topLevel))
+            ShowHUDMessage("HUDPriority added to stage");
+            if(getQualifiedClassName(this.topLevel) == "HUDMenu")
             {
-               stage.addEventListener("VatsPriority::RefreshActionDisplay",this.onRefreshActionDisplay);
-               stage.addEventListener("VatsPriority::UpdateTargetInfo",this.onTargetChanged);
-               trace(MOD_NAME + " added to VATSMenu: " + getQualifiedClassName(this.topLevel));
+               this.debug_tf.x = 400;
+               this.isHUDMenu = true;
+               this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
+               displayMessage("hudTools registered",2);
+               this.initTargetTimer();
+               BSUIDataManager.Subscribe("HUDModeData",this.onHUDModeUpdate);
+               trace(MOD_NAME + " added to HUDMenu");
+               displayMessage(MOD_NAME + " added to HUDMenu",2);
             }
-            else
+            else if(this.topLevel.numChildren > 0)
             {
-               trace(MOD_NAME + " not added to VATSMenu");
-               displayMessage(MOD_NAME + " not added to VATSMenu",0);
+               this.topLevel = this.topLevel.getChildAt(0);
+               if(Boolean(this.topLevel) && getQualifiedClassName(this.topLevel) == "VATSMenu")
+               {
+                  this.hudTools = new SharedHUDTools(MOD_NAME,"VATS");
+                  this.hudTools.Register(this.onReceiveMessage);
+                  displayMessage("hudTools registered",2);
+                  stage.addEventListener("VatsPriority::RefreshActionDisplay",this.onRefreshActionDisplay);
+                  stage.addEventListener("VatsPriority::UpdateTargetInfo",this.onTargetChanged);
+                  trace(MOD_NAME + " added to VATSMenu");
+                  displayMessage(MOD_NAME + " added to VATSMenu",2);
+               }
+               else
+               {
+                  displayMessage(MOD_NAME + " not added to VATSMenu",0);
+                  trace(MOD_NAME + " not added to VATSMenu");
+               }
             }
          }
          else
          {
             trace(MOD_NAME + " not added to stage");
             displayMessage(MOD_NAME + " not added to stage",0);
+         }
+      }
+      
+      private function initTargetTimer() : void
+      {
+         this.targetTimer = new Timer(50);
+         this.targetTimer.addEventListener(TimerEvent.TIMER,this.updateTargetName);
+      }
+      
+      private function updateTargetName() : void
+      {
+         var newTargetName:String;
+         try
+         {
+            newTargetName = this.topLevel.TopCenterGroup_mc.EnemyHealthMeter_mc.DisplayText_mc.DisplayText_tf.text.toUpperCase();
+            if(newTargetName != this.targetName)
+            {
+               this.targetName = newTargetName;
+               displayMessage("Sending message: " + this.targetName,2);
+               setTimeout(this.hudTools.SendMessage,50,MOD_NAME,this.targetName);
+            }
+         }
+         catch(e:*)
+         {
+            displayMessage("Error updating TargetName: " + e,0);
+         }
+      }
+      
+      private function onHUDModeUpdate(event:*) : void
+      {
+         if(event == null || event.data == null)
+         {
+            return;
+         }
+         if(this.isHUDMenu)
+         {
+            if(event.data.hudMode == HUDModes.VATS_MODE)
+            {
+               this.targetTimer.start();
+            }
+            else
+            {
+               this.targetTimer.reset();
+               this.targetName = "";
+            }
+         }
+      }
+      
+      public function onReceiveMessage(sender:String, msg:String) : void
+      {
+         displayMessage("Received message from " + sender + ": " + msg,0);
+         if(sender == HUD_TOOLS_SENDER_NAME)
+         {
+            this.targetName = msg.toUpperCase();
+            displayMessage("Target name set to: \"" + this.targetName + "\"",0);
+            this.setPriority();
          }
       }
       
@@ -219,14 +302,13 @@ package
                displayMessage(parts[part] + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
             }
          }
-         var targetName:String = "".toUpperCase();
          var foundTarget:Boolean = false;
          for(prio in config.priorities)
          {
             if(config.priorities[prio] != null)
             {
                prioLookup = prio.toUpperCase();
-               if(PRIORITY_NO_TARGET_CHECK || targetName.indexOf(prioLookup) != -1)
+               if(this.targetName == "" || this.targetName.indexOf(prioLookup) != -1)
                {
                   for(part in parts)
                   {
