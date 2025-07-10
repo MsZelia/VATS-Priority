@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.0.1";
+      public static const MOD_VERSION:String = "1.0.2";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -31,7 +31,11 @@ package
       
       public static const HUD_TOOLS_SENDER_NAME:String = MOD_NAME + "_HUD";
       
-      public static var DEBUG:int = 1;
+      public static const EVENT_VATS_PRIORITY_REFRESH:String = "VatsPriority::RefreshActionDisplay";
+      
+      public static const EVENT_VATS_PRIORITY_UPDATE_TARGET:String = "VatsPriority::UpdateTargetInfo";
+      
+      public static var DEBUG:int = 0;
        
       
       private var topLevel:*;
@@ -171,33 +175,28 @@ package
             ShowHUDMessage("HUDPriority added to stage");
             if(getQualifiedClassName(this.topLevel) == "HUDMenu")
             {
-               this.debug_tf.x = 400;
-               this.isHUDMenu = true;
                DEBUG = 0;
+               this.isHUDMenu = true;
                this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
-               displayMessage("hudTools registered",2);
                this.initTargetTimer();
                BSUIDataManager.Subscribe("HUDModeData",this.onHUDModeUpdate);
                trace(MOD_NAME + " added to HUDMenu");
-               displayMessage(MOD_NAME + " added to HUDMenu",2);
             }
             else if(this.topLevel.numChildren > 0)
             {
                this.topLevel = this.topLevel.getChildAt(0);
                if(Boolean(this.topLevel) && getQualifiedClassName(this.topLevel) == "VATSMenu")
                {
-                  this.hudTools = new SharedHUDTools(MOD_NAME,"VATS");
+                  this.hudTools = new SharedHUDTools(MOD_NAME);
                   this.hudTools.Register(this.onReceiveMessage);
-                  displayMessage("hudTools registered",2);
-                  stage.addEventListener("VatsPriority::RefreshActionDisplay",this.onRefreshActionDisplay);
-                  stage.addEventListener("VatsPriority::UpdateTargetInfo",this.onTargetChanged);
+                  stage.addEventListener(EVENT_VATS_PRIORITY_REFRESH,this.onRefreshActionDisplay);
+                  stage.addEventListener(EVENT_VATS_PRIORITY_UPDATE_TARGET,this.onTargetChanged);
                   trace(MOD_NAME + " added to VATSMenu");
-                  displayMessage(MOD_NAME + " added to VATSMenu",2);
                }
                else
                {
-                  displayMessage(MOD_NAME + " not added to VATSMenu",0);
                   trace(MOD_NAME + " not added to VATSMenu");
+                  displayMessage(MOD_NAME + " not added to VATSMenu",0);
                }
             }
          }
