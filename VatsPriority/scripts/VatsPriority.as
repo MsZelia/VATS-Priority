@@ -222,7 +222,7 @@ package
             {
                this.targetName = newTargetName;
                displayMessage("Sending message: " + this.targetName,2);
-               setTimeout(this.hudTools.SendMessage,50,MOD_NAME,this.targetName);
+               this.hudTools.SendMessage(MOD_NAME,this.targetName);
             }
          }
          catch(e:*)
