@@ -127,7 +127,7 @@ package
                try
                {
                   config = new JSONDecoder(loader.data,true).getValue();
-                  DEBUG = isHUDMenu ? 0 : config.debug;
+                  DEBUG = isHUDMenu ? -1 : config.debug;
                   config.defaultPriority = config.defaultPriority != null ? config.defaultPriority.toUpperCase() : "HEAD";
                   config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
                   if(config.priorities == null)
@@ -172,10 +172,9 @@ package
          this.topLevel = stage.getChildAt(0);
          if(Boolean(this.topLevel))
          {
-            ShowHUDMessage("HUDPriority added to stage");
             if(getQualifiedClassName(this.topLevel) == "HUDMenu")
             {
-               DEBUG = 0;
+               DEBUG = -1;
                this.isHUDMenu = true;
                this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
                this.initTargetTimer();
