@@ -298,7 +298,7 @@ package
             parts.push(this.topLevel.PartInfos[part].NameTextField.text.toUpperCase());
             if(logMsg)
             {
-               displayMessage(parts[part] + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
+               displayMessage(parts[part] + " " + this.topLevel.PartInfos[part].ChanceToHit.text + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
             }
          }
          var foundTarget:Boolean = false;
