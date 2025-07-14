@@ -130,6 +130,7 @@ package
                   DEBUG = isHUDMenu ? -1 : config.debug;
                   config.defaultPriority = config.defaultPriority != null ? config.defaultPriority.toUpperCase() : "HEAD";
                   config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
+                  config.useTargetNames = Boolean(config.useTargetNames);
                   if(config.priorities == null)
                   {
                      config.priorities = {};
@@ -284,7 +285,7 @@ package
       
       public function setPriority(logMsg:Boolean = true) : void
       {
-         if(!this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
+         if(!this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0 || config.useTargetNames && this.targetName == "")
          {
             return;
          }
@@ -307,7 +308,7 @@ package
             if(config.priorities[prio] != null)
             {
                prioLookup = prio.toUpperCase();
-               if(this.targetName == "" || this.targetName.indexOf(prioLookup) != -1)
+               if(!config.useTargetNames || this.targetName.indexOf(prioLookup) != -1)
                {
                   for(part in parts)
                   {
