@@ -124,6 +124,7 @@ package
          {
             loaderComplete = function(param1:Event):void
             {
+               var _alt:*;
                try
                {
                   config = new JSONDecoder(loader.data,true).getValue();
@@ -135,11 +136,30 @@ package
                   {
                      config.priorities = {};
                   }
-                  for(prio in config.priorities)
+                  for(prioTarget in config.priorities)
                   {
-                     if(config.priorities[prio] != null && config.priorities[prio] is String)
+                     if(config.priorities[prioTarget] != null)
                      {
-                        config.priorities[prio] = config.priorities[prio].toUpperCase();
+                        config.priorities[prioTarget] = [].concat(config.priorities[prioTarget]);
+                        for(alt in config.priorities[prioTarget])
+                        {
+                           _alt = config.priorities[prioTarget][alt];
+                           if(_alt is String)
+                           {
+                              config.priorities[prioTarget][alt] = {
+                                 "partName":_alt.toUpperCase(),
+                                 "minHitChance":0,
+                                 "maxHealth":100
+                              };
+                           }
+                           else if(_alt is Object)
+                           {
+                              displayMessage("alt: " + getQualifiedClassName(_alt),2);
+                              config.priorities[prioTarget][alt].partName = Boolean(_alt.partName) ? _alt.partName.toUpperCase() : config.defaultPriority;
+                              config.priorities[prioTarget][alt].minHitChance = _alt.minHitChance != null && !isNaN(_alt.minHitChance) ? _alt.minHitChance : 0;
+                              config.priorities[prioTarget][alt].maxHealth = _alt.maxHealth != null && !isNaN(_alt.maxHealth) ? _alt.maxHealth : 100;
+                           }
+                        }
                      }
                   }
                   displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
@@ -254,12 +274,12 @@ package
       
       public function onReceiveMessage(sender:String, msg:String) : void
       {
-         displayMessage("Received message from " + sender + ": " + msg,0);
+         displayMessage("Received message from " + sender + ": " + msg,2);
          if(sender == HUD_TOOLS_SENDER_NAME)
          {
             this.targetName = msg.toUpperCase();
-            displayMessage("Target name set to: \"" + this.targetName + "\"",0);
-            this.setPriority();
+            displayMessage("Target name set to: \"" + this.targetName + "\"",1);
+            setTimeout(this.setPriority,20);
          }
       }
       
@@ -299,27 +319,48 @@ package
             parts.push(this.topLevel.PartInfos[part].NameTextField.text.toUpperCase());
             if(logMsg)
             {
-               displayMessage(parts[part] + " " + this.topLevel.PartInfos[part].ChanceToHit.text + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
+               displayMessage(parts[part] + " [" + int(this.topLevel.PartInfos[part].HealthBarIndicator.scaleX * 100) + "] " + this.topLevel.PartInfos[part].ChanceToHit.text + (this.topLevel.SelectedPart == part ? " [S]" : ""),2);
             }
          }
          var foundTarget:Boolean = false;
-         for(prio in config.priorities)
+         var foundPart:Boolean = false;
+         for(prioTarget in config.priorities)
          {
-            if(config.priorities[prio] != null)
+            if(config.priorities[prioTarget] != null)
             {
-               prioLookup = prio.toUpperCase();
+               prioLookup = prioTarget.toUpperCase();
                if(!config.useTargetNames || this.targetName.indexOf(prioLookup) != -1)
                {
-                  for(part in parts)
+                  if(config.useTargetNames)
                   {
-                     if(parts[part].indexOf(config.priorities[prio]) != -1)
+                     foundTarget = true;
+                     displayMessage("Found target: " + prioLookup);
+                  }
+                  for each(altPriority in config.priorities[prioTarget])
+                  {
+                     for(part in parts)
                      {
-                        if(logMsg)
+                        if(parts[part].indexOf(altPriority.partName) != -1)
                         {
-                           displayMessage("Found target " + prioLookup + ", selecting part " + part + ": " + parts[part],1);
+                           if(!foundTarget && !config.useTargetNames && altPriority == config.priorities[prioTarget][0])
+                           {
+                              foundTarget = true;
+                              displayMessage("Found target: " + prioLookup);
+                           }
+                           if(isValidAlternative(part,altPriority))
+                           {
+                              if(logMsg)
+                              {
+                                 displayMessage("Found part " + parts[part] + ", selecting id: " + part,1);
+                              }
+                              this.topLevel.BGSCodeObj.SelectPart(part);
+                              foundPart = true;
+                              break;
+                           }
                         }
-                        this.topLevel.BGSCodeObj.SelectPart(part);
-                        foundTarget = true;
+                     }
+                     if(foundPart)
+                     {
                         break;
                      }
                   }
@@ -330,7 +371,7 @@ package
                }
             }
          }
-         if(!foundTarget)
+         if(!foundPart)
          {
             for(part in parts)
             {
@@ -345,6 +386,28 @@ package
                }
             }
          }
+      }
+      
+      private function isValidAlternative(partId:uint, altConf:Object) : Boolean
+      {
+         var part:* = this.topLevel.PartInfos[partId];
+         if(part != null)
+         {
+            if(part.HealthBarIndicator.scaleX * 100 > altConf.maxHealth)
+            {
+               return false;
+            }
+            if(Number(part.ChanceToHit.text.replace("%","")) <= altConf.minHitChance)
+            {
+               return false;
+            }
+            return true;
+         }
+         return false;
+      }
+      
+      private function compareAlternatives(partId:int, alts:Array) : void
+      {
       }
       
       public function showHUDChildren() : void
