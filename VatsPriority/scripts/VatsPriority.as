@@ -54,6 +54,8 @@ package
       
       private var targetTimer:Timer;
       
+      private var lockTargetTimer:Timer;
+      
       public function VatsPriority()
       {
          super();
@@ -209,6 +211,7 @@ package
                {
                   this.hudTools = new SharedHUDTools(MOD_NAME);
                   this.hudTools.Register(this.onReceiveMessage);
+                  this.initLockTimer();
                   stage.addEventListener(EVENT_VATS_PRIORITY_REFRESH,this.onRefreshActionDisplay);
                   stage.addEventListener(EVENT_VATS_PRIORITY_UPDATE_TARGET,this.onTargetChanged);
                   trace(MOD_NAME + " added to VATSMenu");
@@ -231,6 +234,22 @@ package
       {
          this.targetTimer = new Timer(50);
          this.targetTimer.addEventListener(TimerEvent.TIMER,this.updateTargetName);
+      }
+      
+      private function initLockTimer() : void
+      {
+         this.lockTargetTimer = new Timer(50);
+         this.lockTargetTimer.addEventListener(TimerEvent.TIMER,this.onLockTargetUpdate);
+         this.lockTargetTimer.start();
+      }
+      
+      private function onLockTargetUpdate() : void
+      {
+         if(!config || !config.lockPriorityTarget)
+         {
+            return;
+         }
+         this.setPriority(false);
       }
       
       private function updateTargetName() : void
@@ -334,7 +353,10 @@ package
                   if(config.useTargetNames)
                   {
                      foundTarget = true;
-                     displayMessage("Found target: " + prioLookup);
+                     if(logMsg)
+                     {
+                        displayMessage("Found target: " + prioLookup);
+                     }
                   }
                   for each(altPriority in config.priorities[prioTarget])
                   {
@@ -345,7 +367,10 @@ package
                            if(!foundTarget && !config.useTargetNames && altPriority == config.priorities[prioTarget][0])
                            {
                               foundTarget = true;
-                              displayMessage("Found target: " + prioLookup);
+                              if(logMsg)
+                              {
+                                 displayMessage("Found target: " + prioLookup);
+                              }
                            }
                            if(isValidAlternative(part,altPriority))
                            {
