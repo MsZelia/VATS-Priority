@@ -151,7 +151,7 @@ package
                               config.priorities[prioTarget][alt] = {
                                  "partName":_alt.toUpperCase(),
                                  "minHitChance":-1,
-                                 "minHealth":-1
+                                 "notCrippled":false
                               };
                            }
                            else if(_alt is Object)
@@ -159,7 +159,7 @@ package
                               displayMessage("alt: " + getQualifiedClassName(_alt),2);
                               config.priorities[prioTarget][alt].partName = Boolean(_alt.partName) ? _alt.partName.toUpperCase() : config.defaultPriority;
                               config.priorities[prioTarget][alt].minHitChance = _alt.minHitChance != null && !isNaN(_alt.minHitChance) ? _alt.minHitChance : -1;
-                              config.priorities[prioTarget][alt].minHealth = _alt.minHealth != null && !isNaN(_alt.minHealth) ? _alt.minHealth : -1;
+                              config.priorities[prioTarget][alt].notCrippled = Boolean(_alt.notCrippled);
                            }
                         }
                      }
@@ -422,7 +422,7 @@ package
          var part:* = this.topLevel.PartInfos[partId];
          if(part != null)
          {
-            if(part.HealthBarIndicator.scaleX * 100 < altConf.minHealth)
+            if(altConf.notCrippled && part.HealthBarIndicator.scaleX == 0)
             {
                return false;
             }
