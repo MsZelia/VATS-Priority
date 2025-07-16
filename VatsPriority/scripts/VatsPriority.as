@@ -324,7 +324,11 @@ package
       
       public function setPriority(logMsg:Boolean = true) : void
       {
-         if(!this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0 || config.useTargetNames && this.targetName == "")
+         if(!this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
+         {
+            return;
+         }
+         if(!config || config.disabled || config.useTargetNames && this.targetName == "")
          {
             return;
          }
