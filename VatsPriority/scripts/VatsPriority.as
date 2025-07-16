@@ -156,7 +156,6 @@ package
                            }
                            else if(_alt is Object)
                            {
-                              displayMessage("alt: " + getQualifiedClassName(_alt),2);
                               config.priorities[prioTarget][alt].partName = Boolean(_alt.partName) ? _alt.partName.toUpperCase() : config.defaultPriority;
                               config.priorities[prioTarget][alt].minHitChance = _alt.minHitChance != null && !isNaN(_alt.minHitChance) ? _alt.minHitChance : -1;
                               config.priorities[prioTarget][alt].notCrippled = Boolean(_alt.notCrippled);
