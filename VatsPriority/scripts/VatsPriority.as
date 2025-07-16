@@ -150,7 +150,7 @@ package
                            {
                               config.priorities[prioTarget][alt] = {
                                  "partName":_alt.toUpperCase(),
-                                 "minHitChance":0,
+                                 "minHitChance":-1,
                                  "minHealth":-1
                               };
                            }
@@ -158,7 +158,7 @@ package
                            {
                               displayMessage("alt: " + getQualifiedClassName(_alt),2);
                               config.priorities[prioTarget][alt].partName = Boolean(_alt.partName) ? _alt.partName.toUpperCase() : config.defaultPriority;
-                              config.priorities[prioTarget][alt].minHitChance = _alt.minHitChance != null && !isNaN(_alt.minHitChance) ? _alt.minHitChance : 0;
+                              config.priorities[prioTarget][alt].minHitChance = _alt.minHitChance != null && !isNaN(_alt.minHitChance) ? _alt.minHitChance : -1;
                               config.priorities[prioTarget][alt].minHealth = _alt.minHealth != null && !isNaN(_alt.minHealth) ? _alt.minHealth : -1;
                            }
                         }
@@ -418,11 +418,11 @@ package
          var part:* = this.topLevel.PartInfos[partId];
          if(part != null)
          {
-            if(part.HealthBarIndicator.scaleX * 100 <= altConf.minHealth)
+            if(part.HealthBarIndicator.scaleX * 100 < altConf.minHealth)
             {
                return false;
             }
-            if(Number(part.ChanceToHit.text.replace("%","")) <= altConf.minHitChance)
+            if(Number(part.ChanceToHit.text.replace("%","")) < altConf.minHitChance)
             {
                return false;
             }
