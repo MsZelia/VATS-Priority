@@ -372,14 +372,14 @@ package
                               foundTarget = true;
                               if(logMsg)
                               {
-                                 displayMessage("Found target: " + prioLookup);
+                                 displayMessage("Found target: " + prioLookup,1);
                               }
                            }
                            if(isValidAlternative(part,altPriority))
                            {
                               if(logMsg)
                               {
-                                 displayMessage("Found part " + parts[part] + ", selecting id: " + part,1);
+                                 displayMessage("Found part " + parts[part] + ", id: " + part,1);
                               }
                               this.topLevel.BGSCodeObj.SelectPart(part);
                               foundPart = true;
