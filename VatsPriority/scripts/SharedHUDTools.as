@@ -12,11 +12,15 @@ package
    public class SharedHUDTools
    {
       
-      private static const VERSION:String = "v0.8";
+      private static const VERSION:String = "v1.0";
       
       public static const PREFIX:String = String.fromCharCode(8192,8192);
       
+      public static const READY:String = "HDTREADY";
+      
       public static const REGISTER:String = "REG";
+      
+      public static const UNLOAD:String = "UNLD";
       
       public static const MESSAGE:String = "MSG";
       
@@ -69,6 +73,8 @@ package
       
       private var queueFlag:Boolean = true;
       
+      private var registerQueueFlag:Boolean = false;
+      
       private var _active:Boolean = false;
       
       public function SharedHUDTools(modname:String, hudmode:String = "")
@@ -98,6 +104,7 @@ package
       {
          var text:String = "";
          this.queueFlag = false;
+         this.registerQueueFlag = false;
          for each(text in this.queueArray)
          {
             this.dispatchMessage(text);
@@ -144,6 +151,10 @@ package
                this.messageFunction = func;
                newMsgString = formatMsg(HUDTOOLS,REGISTER,[this.hudMode,VERSION]);
                this.dispatchMessage(newMsgString);
+               if(this.queueFlag)
+               {
+                  this.registerQueueFlag = true;
+               }
                return true;
             }
          }
@@ -152,6 +163,17 @@ package
             return false;
          }
          return false;
+      }
+      
+      public function Shutdown() : void
+      {
+         try
+         {
+            BSUIDataManager.Unsubscribe("MessageEvents",this.onMessageEvent);
+         }
+         catch(e:Error)
+         {
+         }
       }
       
       public function TextEdit(func:Function, startText:String = "") : Boolean
@@ -278,14 +300,7 @@ package
          }
          if(timeout < 0)
          {
-            if(this.menuId.length > 0)
-            {
-               timeout = 0.1;
-            }
-            else
-            {
-               timeout = 0;
-            }
+            timeout = 0;
          }
          this.menuItems += id + "," + text + "," + (isEnabled ? "Y" : "N") + "," + (isMenu ? "Y" : "N") + "," + String(timeout);
       }
@@ -326,12 +341,14 @@ package
          return true;
       }
       
-      public function SendMessage(rec:String, msg:String) : Boolean
+      public function SendMessage(rec:String, msg:String, queue:Boolean = true) : Boolean
       {
          var newMsgString:String;
+         var queueString:String;
          try
          {
-            newMsgString = formatMsg(rec,MESSAGE,[msg]);
+            queueString = queue ? "true" : "false";
+            newMsgString = formatMsg(rec,MESSAGE,[msg,queueString]);
             this.dispatchMessage(newMsgString);
          }
          catch(e:Error)
@@ -383,6 +400,14 @@ package
                                     messageFunction(msgArray[0],msgArray[4]);
                                  }
                               }
+                              else if(msgArray[3] == READY)
+                              {
+                                 if(messageFunction != null && !this.registerQueueFlag)
+                                 {
+                                    newMsgString = formatMsg(HUDTOOLS,REGISTER,[this.hudMode,VERSION]);
+                                    this.dispatchMessage(newMsgString);
+                                 }
+                              }
                               else if(msgArray[3] == TEXTEDIT)
                               {
                                  if(textFunction != null)
@@ -414,29 +439,14 @@ package
                               {
                                  if(buildMenuFunction != null)
                                  {
+                                    this.menuId = this.modName;
                                     if(msgArray.length >= 5)
                                     {
                                        this.menuId = msgArray[4];
-                                       this.menuItems = "";
-                                       buildMenuFunction(msgArray[4]);
                                     }
-                                    else
-                                    {
-                                       this.menuId = "";
-                                       this.menuItems = "";
-                                       buildMenuFunction();
-                                    }
-                                 }
-                                 if(this.menuItems.length > 0)
-                                 {
-                                    if(this.menuId.length > 0)
-                                    {
-                                       newMsgString = formatMsg(HUDTOOLS,BUILDMENU,[this.menuId,this.menuItems]);
-                                    }
-                                    else
-                                    {
-                                       newMsgString = formatMsg(HUDTOOLS,BUILDMENU,[this.menuItems]);
-                                    }
+                                    this.menuItems = "";
+                                    buildMenuFunction(this.menuId);
+                                    newMsgString = formatMsg(HUDTOOLS,BUILDMENU,[this.menuId,this.menuItems]);
                                     this.dispatchMessage(newMsgString);
                                  }
                               }
