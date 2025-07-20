@@ -74,6 +74,23 @@ package
          GlobalFunc.ShowHUDMessage("[" + FULL_MOD_NAME + "] " + param1);
       }
       
+      public static function indexOfCaseInsensitiveString(arr:Array, searchingFor:String, fromIndex:uint = 0) : int
+      {
+         var uppercaseSearchString:String = searchingFor.toUpperCase();
+         var arrayLength:uint = arr.length;
+         var index:uint = fromIndex;
+         while(index < arrayLength)
+         {
+            var element:* = arr[index];
+            if(element is String && uppercaseSearchString.indexOf(element.toUpperCase()) != -1)
+            {
+               return index;
+            }
+            index++;
+         }
+         return -1;
+      }
+      
       private function createDebugTf() : void
       {
          this.debug_tf = new TextField();
@@ -133,6 +150,7 @@ package
                   DEBUG = isHUDMenu ? -1 : config.debug;
                   config.defaultPriority = config.defaultPriority != null ? config.defaultPriority.toUpperCase() : "HEAD";
                   config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
+                  config.lockPriorityTargetExcluded = [].concat(config.lockPriorityTargetExcluded);
                   config.useTargetNames = Boolean(config.useTargetNames);
                   if(config.priorities == null)
                   {
@@ -244,7 +262,7 @@ package
       
       private function onLockTargetUpdate() : void
       {
-         if(!config || !config.lockPriorityTarget)
+         if(!isTargetLocked())
          {
             return;
          }
@@ -303,7 +321,7 @@ package
       
       public function onRefreshActionDisplay(event:Event) : void
       {
-         if(!config || !config.lockPriorityTarget)
+         if(!isTargetLocked())
          {
             return;
          }
@@ -434,8 +452,17 @@ package
          return false;
       }
       
-      private function compareAlternatives(partId:int, alts:Array) : void
+      private function isTargetLocked() : Boolean
       {
+         if(!config || !this.targetName)
+         {
+            return false;
+         }
+         if(config.lockPriorityTarget)
+         {
+            return indexOfCaseInsensitiveString(config.lockPriorityTargetExcluded,this.targetName) == -1;
+         }
+         return indexOfCaseInsensitiveString(config.lockPriorityTargetExcluded,this.targetName) != -1;
       }
       
       public function showHUDChildren() : void
