@@ -12,7 +12,7 @@ package
    public class SharedHUDTools
    {
       
-      private static const VERSION:String = "v1.0";
+      private static const VERSION:String = "v1.1";
       
       public static const PREFIX:String = String.fromCharCode(8192,8192);
       
@@ -25,6 +25,8 @@ package
       public static const MESSAGE:String = "MSG";
       
       public static const TEXTEDIT:String = "TXT";
+      
+      public static const STOPTEXTEDIT:String = "XTXT";
       
       public static const FORMATTEXTEDIT:String = "FMTTXT";
       
@@ -41,6 +43,8 @@ package
       public static const BROADCAST:String = "BROADCASTALLMODS";
       
       public static const MENU:String = "MENU";
+      
+      public static const STOPMENU:String = "XMENU";
       
       public static const FORMATMENU:String = "FMTMENU";
       
@@ -195,6 +199,21 @@ package
          return true;
       }
       
+      public function EndTextEdit() : Boolean
+      {
+         var newMsgString:String;
+         try
+         {
+            newMsgString = formatMsg(HUDTOOLS,STOPTEXTEDIT,[]);
+            this.dispatchMessage(newMsgString);
+         }
+         catch(e:Error)
+         {
+            return false;
+         }
+         return true;
+      }
+      
       public function FormatTextEdit(x:Number, y:Number, width:Number, height:Number, font:String = "", size:Number = -1, hexColor:String = "", bgHexColor:String = "", bgAlpha:Number = -1) : Boolean
       {
          var newMsgString:String;
@@ -281,6 +300,21 @@ package
          catch(e:Error)
          {
             isActive = false;
+            return false;
+         }
+         return true;
+      }
+      
+      public function CloseMenu() : Boolean
+      {
+         var newMsgString:String;
+         try
+         {
+            newMsgString = formatMsg(HUDTOOLS,STOPMENU,[]);
+            this.dispatchMessage(newMsgString);
+         }
+         catch(e:Error)
+         {
             return false;
          }
          return true;
