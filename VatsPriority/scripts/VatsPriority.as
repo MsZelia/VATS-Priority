@@ -36,6 +36,12 @@ package
       public static const EVENT_VATS_PRIORITY_UPDATE_TARGET:String = "VatsPriority::UpdateTargetInfo";
       
       public static var DEBUG:int = 0;
+      
+      public static var DISABLED:Boolean = false;
+      
+      private static const HUDTOOLS_MENU_ENABLE:String = MOD_NAME + "_ENABLE";
+      
+      private static const HUDTOOLS_MENU_DISABLE:String = MOD_NAME + "_DISABLE";
        
       
       private var topLevel:*;
@@ -61,7 +67,7 @@ package
          super();
          this.createDebugTf();
          this.loadConfig();
-         addEventListener(Event.ADDED_TO_STAGE,this.addedToStageHandler);
+         addEventListener(Event.ADDED_TO_STAGE,this.addedToStageHandler,false,0,true);
       }
       
       public static function toString(param1:Object) : String
@@ -137,6 +143,7 @@ package
       private function loadConfig() : void
       {
          var loaderComplete:Function;
+         var ioErrorHandler:Function;
          var url:URLRequest = null;
          var loader:URLLoader = null;
          try
@@ -148,6 +155,7 @@ package
                {
                   config = new JSONDecoder(loader.data,true).getValue();
                   DEBUG = isHUDMenu ? -1 : config.debug;
+                  DISABLED = Boolean(config.disabled);
                   config.defaultPriority = config.defaultPriority != null ? config.defaultPriority.toUpperCase() : "HEAD";
                   config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
                   config.lockPriorityTargetExcluded = [].concat(config.lockPriorityTargetExcluded);
@@ -189,12 +197,17 @@ package
                {
                   displayMessage(FULL_MOD_NAME + " | Error parsing config: " + e,0);
                }
+               loader.removeEventListener(Event.COMPLETE,loaderComplete);
+            };
+            ioErrorHandler = function(param1:Event):void
+            {
+               displayMessage(FULL_MOD_NAME + " | Error loading config :: " + param1.text,0);
             };
             url = new URLRequest(CONFIG_FILE);
             loader = new URLLoader();
             loader.load(url);
-            loader.addEventListener(Event.COMPLETE,loaderComplete);
-            loader.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+            loader.addEventListener(Event.COMPLETE,loaderComplete,false,0,true);
+            loader.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler,false,0,true);
          }
          catch(e:Error)
          {
@@ -202,13 +215,10 @@ package
          }
       }
       
-      private function ioErrorHandler(event:IOErrorEvent) : void
-      {
-         displayMessage(FULL_MOD_NAME + " | Error loading config :: " + event.text,0);
-      }
-      
       public function addedToStageHandler(param1:Event) : *
       {
+         removeEventListener(Event.ADDED_TO_STAGE,this.addedToStageHandler);
+         addEventListener(Event.REMOVED_FROM_STAGE,this.removedFromStageHandler);
          this.topLevel = stage.getChildAt(0);
          if(Boolean(this.topLevel))
          {
@@ -217,6 +227,8 @@ package
                DEBUG = -1;
                this.isHUDMenu = true;
                this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
+               this.hudTools.FormatMenu(50,-100);
+               this.hudTools.RegisterMenu(this.onBuildMenu,this.onSelectMenu);
                this.initTargetRefreshTimer();
                BSUIDataManager.Subscribe("HUDModeData",this.onHUDModeUpdate);
                trace(MOD_NAME + " added to HUDMenu");
@@ -229,8 +241,8 @@ package
                   this.hudTools = new SharedHUDTools(MOD_NAME);
                   this.hudTools.Register(this.onReceiveMessage);
                   this.initTargetLockTimer();
-                  stage.addEventListener(EVENT_VATS_PRIORITY_REFRESH,this.onRefreshActionDisplay);
-                  stage.addEventListener(EVENT_VATS_PRIORITY_UPDATE_TARGET,this.onTargetChanged);
+                  stage.addEventListener(EVENT_VATS_PRIORITY_REFRESH,this.onRefreshActionDisplay,false,0,true);
+                  stage.addEventListener(EVENT_VATS_PRIORITY_UPDATE_TARGET,this.onTargetChanged,false,0,true);
                   trace(MOD_NAME + " added to VATSMenu");
                }
                else
@@ -247,16 +259,64 @@ package
          }
       }
       
+      public function removedFromStageHandler(param1:Event) : *
+      {
+         if(stage)
+         {
+            stage.removeEventListener(EVENT_VATS_PRIORITY_REFRESH,this.onRefreshActionDisplay);
+            stage.removeEventListener(EVENT_VATS_PRIORITY_UPDATE_TARGET,this.onTargetChanged);
+         }
+         if(this.refreshTargetTimer)
+         {
+            this.refreshTargetTimer.removeEventListener(TimerEvent.TIMER,this.updateTargetName);
+         }
+         if(this.lockTargetTimer)
+         {
+            this.lockTargetTimer.removeEventListener(TimerEvent.TIMER,this.onLockTargetUpdate);
+         }
+         if(this.hudtools)
+         {
+            this.hudtools.Shutdown();
+         }
+      }
+      
+      public function onBuildMenu(parentItem:String = null) : *
+      {
+         try
+         {
+            if(parentItem == HUD_TOOLS_SENDER_NAME)
+            {
+               this.hudTools.AddMenuItem(HUDTOOLS_MENU_ENABLE,"Enable",true,false,250);
+               this.hudTools.AddMenuItem(HUDTOOLS_MENU_DISABLE,"Disable",true,false,250);
+            }
+         }
+         catch(e:Error)
+         {
+         }
+      }
+      
+      public function onSelectMenu(selectItem:String) : *
+      {
+         if(selectItem == HUDTOOLS_MENU_DISABLE)
+         {
+            DISABLED = true;
+         }
+         else if(selectItem == HUDTOOLS_MENU_ENABLE)
+         {
+            DISABLED = false;
+         }
+      }
+      
       private function initTargetRefreshTimer() : void
       {
          this.refreshTargetTimer = new Timer(50);
-         this.refreshTargetTimer.addEventListener(TimerEvent.TIMER,this.updateTargetName);
+         this.refreshTargetTimer.addEventListener(TimerEvent.TIMER,this.updateTargetName,false,0,true);
       }
       
       private function initTargetLockTimer() : void
       {
          this.lockTargetTimer = new Timer(50);
-         this.lockTargetTimer.addEventListener(TimerEvent.TIMER,this.onLockTargetUpdate);
+         this.lockTargetTimer.addEventListener(TimerEvent.TIMER,this.onLockTargetUpdate,false,0,true);
          this.lockTargetTimer.start();
       }
       
@@ -300,12 +360,27 @@ package
             {
                if(event.data.hudMode == HUDModes.VATS_MODE)
                {
-                  this.refreshTargetTimer.start();
+                  if(DISABLED)
+                  {
+                     this.hudTools.SendMessage(MOD_NAME,HUDTOOLS_MENU_DISABLE);
+                  }
+                  else
+                  {
+                     this.refreshTargetTimer.start();
+                  }
                }
                else
                {
                   this.refreshTargetTimer.reset();
                   this.targetName = "";
+                  if(config && config.showModMenu)
+                  {
+                     this.hudTools.CloseMenu();
+                  }
+               }
+               if(config && config.showModMenu && event.data.hudMode == HUDModes.PIPBOY)
+               {
+                  this.hudTools.ShowMenu();
                }
             }
          }
@@ -322,9 +397,16 @@ package
             displayMessage("Received message from " + sender + ": " + msg,2);
             if(sender == HUD_TOOLS_SENDER_NAME)
             {
-               this.targetName = msg.toUpperCase();
-               displayMessage("Target name set to: \"" + this.targetName + "\"",1);
-               setTimeout(this.setPriority,20);
+               if(msg == HUDTOOLS_MENU_DISABLE)
+               {
+                  displayMessage("Mod disabled!",1);
+               }
+               else
+               {
+                  this.targetName = msg.toUpperCase();
+                  displayMessage("Target name set to: \"" + this.targetName + "\"",1);
+                  setTimeout(this.setPriority,20);
+               }
             }
          }
          catch(e:Error)
@@ -355,7 +437,7 @@ package
       
       public function setPriority(logMsg:Boolean = true) : void
       {
-         if(!this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
+         if(DISABLED || !this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
          {
             return;
          }
