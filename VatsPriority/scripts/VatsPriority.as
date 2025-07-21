@@ -52,7 +52,7 @@ package
       
       private var targetName:String = "";
       
-      private var targetTimer:Timer;
+      private var refreshTargetTimer:Timer;
       
       private var lockTargetTimer:Timer;
       
@@ -129,7 +129,7 @@ package
          {
             str = toString(param1);
          }
-         this.debug_tf.text = this.debug_tf.text + "\n" + str;
+         this.debug_tf.text = this.debug_tf.text.substr(-4096) + "\n" + str;
          this.debug_tf.visible = true;
          this.debug_tf.scrollV = this.debug_tf.maxScrollV;
       }
@@ -217,7 +217,7 @@ package
                DEBUG = -1;
                this.isHUDMenu = true;
                this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
-               this.initTargetTimer();
+               this.initTargetRefreshTimer();
                BSUIDataManager.Subscribe("HUDModeData",this.onHUDModeUpdate);
                trace(MOD_NAME + " added to HUDMenu");
             }
@@ -228,7 +228,7 @@ package
                {
                   this.hudTools = new SharedHUDTools(MOD_NAME);
                   this.hudTools.Register(this.onReceiveMessage);
-                  this.initLockTimer();
+                  this.initTargetLockTimer();
                   stage.addEventListener(EVENT_VATS_PRIORITY_REFRESH,this.onRefreshActionDisplay);
                   stage.addEventListener(EVENT_VATS_PRIORITY_UPDATE_TARGET,this.onTargetChanged);
                   trace(MOD_NAME + " added to VATSMenu");
@@ -247,13 +247,13 @@ package
          }
       }
       
-      private function initTargetTimer() : void
+      private function initTargetRefreshTimer() : void
       {
-         this.targetTimer = new Timer(50);
-         this.targetTimer.addEventListener(TimerEvent.TIMER,this.updateTargetName);
+         this.refreshTargetTimer = new Timer(50);
+         this.refreshTargetTimer.addEventListener(TimerEvent.TIMER,this.updateTargetName);
       }
       
-      private function initLockTimer() : void
+      private function initTargetLockTimer() : void
       {
          this.lockTargetTimer = new Timer(50);
          this.lockTargetTimer.addEventListener(TimerEvent.TIMER,this.onLockTargetUpdate);
@@ -290,32 +290,46 @@ package
       
       private function onHUDModeUpdate(event:*) : void
       {
-         if(event == null || event.data == null)
+         try
          {
-            return;
+            if(event == null || event.data == null)
+            {
+               return;
+            }
+            if(this.isHUDMenu)
+            {
+               if(event.data.hudMode == HUDModes.VATS_MODE)
+               {
+                  this.refreshTargetTimer.start();
+               }
+               else
+               {
+                  this.refreshTargetTimer.reset();
+                  this.targetName = "";
+               }
+            }
          }
-         if(this.isHUDMenu)
+         catch(e:Error)
          {
-            if(event.data.hudMode == HUDModes.VATS_MODE)
-            {
-               this.targetTimer.start();
-            }
-            else
-            {
-               this.targetTimer.reset();
-               this.targetName = "";
-            }
+            displayMessage("Error updating HUDMode: " + e,0);
          }
       }
       
       public function onReceiveMessage(sender:String, msg:String) : void
       {
-         displayMessage("Received message from " + sender + ": " + msg,2);
-         if(sender == HUD_TOOLS_SENDER_NAME)
+         try
          {
-            this.targetName = msg.toUpperCase();
-            displayMessage("Target name set to: \"" + this.targetName + "\"",1);
-            setTimeout(this.setPriority,20);
+            displayMessage("Received message from " + sender + ": " + msg,2);
+            if(sender == HUD_TOOLS_SENDER_NAME)
+            {
+               this.targetName = msg.toUpperCase();
+               displayMessage("Target name set to: \"" + this.targetName + "\"",1);
+               setTimeout(this.setPriority,20);
+            }
+         }
+         catch(e:Error)
+         {
+            displayMessage("onReceiveMessage error (" + sender + ":" + msg + "): " + e,0);
          }
       }
       
