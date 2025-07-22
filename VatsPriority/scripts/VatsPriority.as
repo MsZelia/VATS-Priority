@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.0.2";
+      public static const MOD_VERSION:String = "1.1.0";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
