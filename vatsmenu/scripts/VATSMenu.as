@@ -5,7 +5,6 @@ package
    import Shared.AS3.Data.BSUIDataManager;
    import Shared.AS3.Data.FromClientDataEvent;
    import Shared.AS3.IMenu;
-   import Shared.GlobalFunc;
    import flash.display.Loader;
    import flash.display.MovieClip;
    import flash.display.StageAlign;
@@ -115,26 +114,11 @@ package
          try
          {
             modLoader = new Loader();
-            modLoader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,this.uncaughtErrorHandler);
             modLoader.load(new URLRequest(param1),new LoaderContext(false,ApplicationDomain.currentDomain));
             addChild(modLoader);
          }
          catch(e:Error)
          {
-            GlobalFunc.ShowHUDMessage("Error loading mod: " + e);
-         }
-      }
-      
-      private function uncaughtErrorHandler(param1:UncaughtErrorEvent) : void
-      {
-         GlobalFunc.ShowHUDMessage("Error loading mod: " + param1);
-      }
-      
-      private function displayMessage(message:String) : void
-      {
-         if(modLoader && modLoader.content)
-         {
-            modLoader.content.displayMessage(message);
          }
       }
       
