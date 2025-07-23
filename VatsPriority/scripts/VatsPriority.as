@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.0";
+      public static const MOD_VERSION:String = "1.1.1";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -140,6 +140,28 @@ package
          this.debug_tf.scrollV = this.debug_tf.maxScrollV;
       }
       
+      private function loadPartData(partData:*) : Object
+      {
+         var newData:Object = null;
+         if(partData is String)
+         {
+            newData = {
+               "partName":partData.toUpperCase(),
+               "minHitChance":-1,
+               "notCrippled":false
+            };
+         }
+         else if(partData is Object)
+         {
+            newData = {
+               "partName":(partData.partName != null && partData.partName is String ? partData.partName.toUpperCase() : ""),
+               "minHitChance":(partData.minHitChance != null && !isNaN(partData.minHitChance) ? partData.minHitChance : -1),
+               "notCrippled":Boolean(partData.notCrippled)
+            };
+         }
+         return newData;
+      }
+      
       private function loadConfig() : void
       {
          var loaderComplete:Function;
@@ -156,10 +178,24 @@ package
                   config = new JSONDecoder(loader.data,true).getValue();
                   DEBUG = isHUDMenu ? -1 : config.debug;
                   DISABLED = Boolean(config.disabled);
-                  config.defaultPriority = config.defaultPriority != null ? config.defaultPriority.toUpperCase() : "HEAD";
                   config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
                   config.lockPriorityTargetExcluded = [].concat(config.lockPriorityTargetExcluded);
                   config.useTargetNames = Boolean(config.useTargetNames);
+                  if(config.defaultPriority == null)
+                  {
+                     config.defaultPriority = ["HEAD"];
+                  }
+                  else
+                  {
+                     config.defaultPriority = [].concat(config.defaultPriority);
+                  }
+                  for(prioTarget in config.defaultPriority)
+                  {
+                     if(config.defaultPriority[prioTarget] != null)
+                     {
+                        config.defaultPriority[prioTarget] = loadPartData(config.defaultPriority[prioTarget]);
+                     }
+                  }
                   if(config.priorities == null)
                   {
                      config.priorities = {};
@@ -171,21 +207,7 @@ package
                         config.priorities[prioTarget] = [].concat(config.priorities[prioTarget]);
                         for(alt in config.priorities[prioTarget])
                         {
-                           _alt = config.priorities[prioTarget][alt];
-                           if(_alt is String)
-                           {
-                              config.priorities[prioTarget][alt] = {
-                                 "partName":_alt.toUpperCase(),
-                                 "minHitChance":-1,
-                                 "notCrippled":false
-                              };
-                           }
-                           else if(_alt is Object)
-                           {
-                              config.priorities[prioTarget][alt].partName = Boolean(_alt.partName) ? _alt.partName.toUpperCase() : config.defaultPriority;
-                              config.priorities[prioTarget][alt].minHitChance = _alt.minHitChance != null && !isNaN(_alt.minHitChance) ? _alt.minHitChance : -1;
-                              config.priorities[prioTarget][alt].notCrippled = Boolean(_alt.notCrippled);
-                           }
+                           config.priorities[prioTarget][alt] = loadPartData(config.priorities[prioTarget][alt]);
                         }
                      }
                   }
@@ -489,7 +511,7 @@ package
                                  displayMessage("Found target: " + prioLookup,1);
                               }
                            }
-                           if(isValidAlternative(part,altPriority))
+                           if(this.isValidAlternative(part,altPriority))
                            {
                               if(logMsg)
                               {
@@ -515,15 +537,26 @@ package
          }
          if(!foundPart)
          {
-            for(part in parts)
+            for each(altPriority in config.defaultPriority)
             {
-               if(parts[part].indexOf(config.defaultPriority) != -1)
+               for(part in parts)
                {
-                  if(logMsg)
+                  if(parts[part].indexOf(altPriority.partName) != -1)
                   {
-                     displayMessage("Default priority, selecting part " + part + ": " + parts[part],1);
+                     if(this.isValidAlternative(part,altPriority))
+                     {
+                        if(logMsg)
+                        {
+                           displayMessage("Default priority, selecting part " + parts[part] + ", id: " + part,1);
+                        }
+                        this.topLevel.BGSCodeObj.SelectPart(part);
+                        foundPart = true;
+                        break;
+                     }
                   }
-                  this.topLevel.BGSCodeObj.SelectPart(part);
+               }
+               if(foundPart)
+               {
                   break;
                }
             }
