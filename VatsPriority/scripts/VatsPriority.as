@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.1";
+      public static const MOD_VERSION:String = "1.1.2";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -66,7 +66,6 @@ package
       {
          super();
          this.createDebugTf();
-         this.loadConfig();
          addEventListener(Event.ADDED_TO_STAGE,this.addedToStageHandler,false,0,true);
       }
       
@@ -211,6 +210,22 @@ package
                         }
                      }
                   }
+                  config.targetSoundIndicatorKeys = [];
+                  if(config.targetSoundIndicator == null)
+                  {
+                     config.targetSoundIndicator = {};
+                  }
+                  else
+                  {
+                     for(targetSound in config.targetSoundIndicator)
+                     {
+                        config.targetSoundIndicatorKeys.push(targetSound);
+                        if(config.targetSoundIndicator[targetSound] == null || !(config.targetSoundIndicator[targetSound] is String))
+                        {
+                           config.targetSoundIndicator[targetSound] = "";
+                        }
+                     }
+                  }
                   displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
                   displayMessage(toString(config),2);
                   setPriority();
@@ -246,6 +261,7 @@ package
          {
             if(getQualifiedClassName(this.topLevel) == "HUDMenu")
             {
+               setTimeout(this.loadConfig,5000);
                DEBUG = -1;
                this.isHUDMenu = true;
                this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
@@ -260,6 +276,7 @@ package
                this.topLevel = this.topLevel.getChildAt(0);
                if(Boolean(this.topLevel) && getQualifiedClassName(this.topLevel) == "VATSMenu")
                {
+                  this.loadConfig();
                   this.hudTools = new SharedHUDTools(MOD_NAME);
                   this.hudTools.Register(this.onReceiveMessage);
                   this.initTargetLockTimer();
@@ -362,11 +379,30 @@ package
                this.targetName = newTargetName;
                displayMessage("Sending message: " + this.targetName,2);
                this.hudTools.SendMessage(MOD_NAME,this.targetName);
+               this.checkTargetSoundIndicator();
             }
          }
          catch(e:*)
          {
             displayMessage("Error updating TargetName: " + e,0);
+         }
+      }
+      
+      private function checkTargetSoundIndicator() : void
+      {
+         if(this.targetName == "")
+         {
+            return;
+         }
+         var targetSoundId:int = indexOfCaseInsensitiveString(config.targetSoundIndicatorKeys,this.targetName);
+         if(targetSoundId != -1)
+         {
+            var sound:String = config.targetSoundIndicator[config.targetSoundIndicatorKeys[targetSoundId]];
+            if(sound != "")
+            {
+               GlobalFunc.PlayMenuSound(sound);
+               displayMessage("Playing targetSoundIndicator: " + config.targetSoundIndicatorKeys[targetSoundId],2);
+            }
          }
       }
       
@@ -459,7 +495,7 @@ package
       
       public function setPriority(logMsg:Boolean = true) : void
       {
-         if(DISABLED || !this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
+         if(DISABLED || this.isHUDMenu || !this.topLevel || !this.topLevel.PartInfos || this.topLevel.PartInfos.length == 0)
          {
             return;
          }
