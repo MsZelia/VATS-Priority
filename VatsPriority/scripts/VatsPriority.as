@@ -216,6 +216,7 @@ package
                            }
                         }
                      }
+                     config.useTargetSoundIndicator = Boolean(config.useTargetSoundIndicator);
                      config.targetSoundIndicatorKeys = [];
                      if(config.targetSoundIndicator == null)
                      {
@@ -412,7 +413,7 @@ package
       
       private function checkTargetSoundIndicator() : void
       {
-         if(this.targetName == "")
+         if(!config.useTargetSoundIndicator || this.targetName == "")
          {
             return;
          }
@@ -423,7 +424,6 @@ package
             if(sound != "")
             {
                GlobalFunc.PlayMenuSound(sound);
-               displayMessage("Playing targetSoundIndicator: " + config.targetSoundIndicatorKeys[targetSoundId],2);
             }
          }
       }
