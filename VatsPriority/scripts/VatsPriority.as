@@ -44,6 +44,8 @@ package
       private static const HUDTOOLS_MENU_ENABLE:String = MOD_NAME + "_ENABLE";
       
       private static const HUDTOOLS_MENU_DISABLE:String = MOD_NAME + "_DISABLE";
+      
+      private static const HUDTOOLS_MENU_TOGGLE_SOUND_INDICATOR:* = MOD_NAME + "_TOGGLE_SOUND_INDICATOR";
        
       
       private var topLevel:*;
@@ -341,8 +343,9 @@ package
          {
             if(parentItem == HUD_TOOLS_SENDER_NAME)
             {
-               this.hudTools.AddMenuItem(HUDTOOLS_MENU_ENABLE,"Enable",true,false,250);
-               this.hudTools.AddMenuItem(HUDTOOLS_MENU_DISABLE,"Disable",true,false,250);
+               this.hudTools.AddMenuItem(HUDTOOLS_MENU_ENABLE,"ENABLE MOD",DISABLED,false,-1);
+               this.hudTools.AddMenuItem(HUDTOOLS_MENU_DISABLE,"DISABLE MOD",!DISABLED,false,-1);
+               this.hudTools.AddMenuItem(HUDTOOLS_MENU_TOGGLE_SOUND_INDICATOR,"Toggle Sound Indicator",true,false,250);
             }
          }
          catch(e:Error)
@@ -359,6 +362,13 @@ package
          else if(selectItem == HUDTOOLS_MENU_ENABLE)
          {
             DISABLED = false;
+         }
+         else if(selectItem == HUDTOOLS_MENU_TOGGLE_SOUND_INDICATOR)
+         {
+            if(config)
+            {
+               config.useTargetSoundIndicator = !config.useTargetSoundIndicator;
+            }
          }
       }
       
