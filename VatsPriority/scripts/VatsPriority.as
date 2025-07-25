@@ -29,6 +29,8 @@ package
       
       public static const CONFIG_FILE:String = "../VATSPriorityConfig.json";
       
+      public static const CONFIG_RELOAD_TIME:uint = 10500;
+      
       public static const HUD_TOOLS_SENDER_NAME:String = MOD_NAME + "_HUD";
       
       public static const EVENT_VATS_PRIORITY_REFRESH:String = "VatsPriority::RefreshActionDisplay";
@@ -51,6 +53,8 @@ package
       private var lastConfig:String;
       
       private var config:Object;
+      
+      private var configTimer:Timer;
       
       private var isHUDMenu:Boolean = false;
       
@@ -174,71 +178,78 @@ package
                var _alt:*;
                try
                {
-                  config = new JSONDecoder(loader.data,true).getValue();
-                  DEBUG = isHUDMenu ? -1 : config.debug;
-                  DISABLED = Boolean(config.disabled);
-                  config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
-                  config.lockPriorityTargetExcluded = [].concat(config.lockPriorityTargetExcluded);
-                  config.useTargetNames = Boolean(config.useTargetNames);
-                  if(config.defaultPriority == null)
+                  if(lastConfig != loader.data)
                   {
-                     config.defaultPriority = ["HEAD"];
-                  }
-                  else
-                  {
-                     config.defaultPriority = [].concat(config.defaultPriority);
-                  }
-                  for(prioTarget in config.defaultPriority)
-                  {
-                     if(config.defaultPriority[prioTarget] != null)
+                     config = new JSONDecoder(loader.data,true).getValue();
+                     DEBUG = isHUDMenu ? -1 : config.debug;
+                     DISABLED = Boolean(config.disabled);
+                     config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
+                     config.lockPriorityTargetExcluded = [].concat(config.lockPriorityTargetExcluded);
+                     config.useTargetNames = Boolean(config.useTargetNames);
+                     if(config.defaultPriority == null)
                      {
-                        config.defaultPriority[prioTarget] = loadPartData(config.defaultPriority[prioTarget]);
+                        config.defaultPriority = ["HEAD"];
                      }
-                  }
-                  if(config.priorities == null)
-                  {
-                     config.priorities = {};
-                  }
-                  for(prioTarget in config.priorities)
-                  {
-                     if(config.priorities[prioTarget] != null)
+                     else
                      {
-                        config.priorities[prioTarget] = [].concat(config.priorities[prioTarget]);
-                        for(alt in config.priorities[prioTarget])
+                        config.defaultPriority = [].concat(config.defaultPriority);
+                     }
+                     for(prioTarget in config.defaultPriority)
+                     {
+                        if(config.defaultPriority[prioTarget] != null)
                         {
-                           config.priorities[prioTarget][alt] = loadPartData(config.priorities[prioTarget][alt]);
+                           config.defaultPriority[prioTarget] = loadPartData(config.defaultPriority[prioTarget]);
                         }
                      }
-                  }
-                  config.targetSoundIndicatorKeys = [];
-                  if(config.targetSoundIndicator == null)
-                  {
-                     config.targetSoundIndicator = {};
-                  }
-                  else
-                  {
-                     for(targetSound in config.targetSoundIndicator)
+                     if(config.priorities == null)
                      {
-                        config.targetSoundIndicatorKeys.push(targetSound);
-                        if(config.targetSoundIndicator[targetSound] == null || !(config.targetSoundIndicator[targetSound] is String))
+                        config.priorities = {};
+                     }
+                     for(prioTarget in config.priorities)
+                     {
+                        if(config.priorities[prioTarget] != null)
                         {
-                           config.targetSoundIndicator[targetSound] = "";
+                           config.priorities[prioTarget] = [].concat(config.priorities[prioTarget]);
+                           for(alt in config.priorities[prioTarget])
+                           {
+                              config.priorities[prioTarget][alt] = loadPartData(config.priorities[prioTarget][alt]);
+                           }
                         }
                      }
+                     config.targetSoundIndicatorKeys = [];
+                     if(config.targetSoundIndicator == null)
+                     {
+                        config.targetSoundIndicator = {};
+                     }
+                     else
+                     {
+                        for(targetSound in config.targetSoundIndicator)
+                        {
+                           config.targetSoundIndicatorKeys.push(targetSound);
+                           if(config.targetSoundIndicator[targetSound] == null || !(config.targetSoundIndicator[targetSound] is String))
+                           {
+                              config.targetSoundIndicator[targetSound] = "";
+                           }
+                        }
+                     }
+                     displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
+                     displayMessage(toString(config),2);
+                     setPriority();
+                     lastConfig = loader.data;
                   }
-                  displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
-                  displayMessage(toString(config),2);
-                  setPriority();
                }
                catch(e:Error)
                {
                   displayMessage(FULL_MOD_NAME + " | Error parsing config: " + e,0);
                }
                loader.removeEventListener(Event.COMPLETE,loaderComplete);
+               loader.removeEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
             };
             ioErrorHandler = function(param1:Event):void
             {
                displayMessage(FULL_MOD_NAME + " | Error loading config :: " + param1.text,0);
+               loader.removeEventListener(Event.COMPLETE,loaderComplete);
+               loader.removeEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
             };
             url = new URLRequest(CONFIG_FILE);
             loader = new URLLoader();
@@ -261,13 +272,13 @@ package
          {
             if(getQualifiedClassName(this.topLevel) == "HUDMenu")
             {
-               setTimeout(this.loadConfig,5000);
                DEBUG = -1;
                this.isHUDMenu = true;
                this.hudTools = new SharedHUDTools(HUD_TOOLS_SENDER_NAME);
                this.hudTools.FormatMenu(50,-100);
                this.hudTools.RegisterMenu(this.onBuildMenu,this.onSelectMenu);
                this.initTargetRefreshTimer();
+               this.initConfigTimer();
                BSUIDataManager.Subscribe("HUDModeData",this.onHUDModeUpdate);
                trace(MOD_NAME + " added to HUDMenu");
             }
@@ -313,6 +324,10 @@ package
          {
             this.lockTargetTimer.removeEventListener(TimerEvent.TIMER,this.onLockTargetUpdate);
          }
+         if(this.configTimer)
+         {
+            this.configTimer.removeEventListener(TimerEvent.TIMER,this.loadConfig);
+         }
          if(this.hudtools)
          {
             this.hudtools.Shutdown();
@@ -350,6 +365,13 @@ package
       {
          this.refreshTargetTimer = new Timer(50);
          this.refreshTargetTimer.addEventListener(TimerEvent.TIMER,this.updateTargetName,false,0,true);
+      }
+      
+      private function initConfigTimer() : void
+      {
+         this.configTimer = new Timer(CONFIG_RELOAD_TIME);
+         this.configTimer.addEventListener(TimerEvent.TIMER,this.loadConfig,false,0,true);
+         this.configTimer.start();
       }
       
       private function initTargetLockTimer() : void
