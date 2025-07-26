@@ -2,7 +2,6 @@ package utils
 {
    public class StringUtil
    {
-       
       
       public function StringUtil()
       {
@@ -49,3 +48,4 @@ package utils
       }
    }
 }
+

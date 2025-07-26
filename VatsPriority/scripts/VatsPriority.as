@@ -46,7 +46,6 @@ package
       private static const HUDTOOLS_MENU_DISABLE:String = MOD_NAME + "_DISABLE";
       
       private static const HUDTOOLS_MENU_TOGGLE_SOUND_INDICATOR:* = MOD_NAME + "_TOGGLE_SOUND_INDICATOR";
-       
       
       private var topLevel:*;
       
@@ -691,3 +690,4 @@ package
       }
    }
 }
+
