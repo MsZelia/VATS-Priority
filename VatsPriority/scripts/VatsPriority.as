@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.2";
+      public static const MOD_VERSION:String = "1.1.3";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -183,7 +183,11 @@ package
                   if(lastConfig != loader.data)
                   {
                      config = new JSONDecoder(loader.data,true).getValue();
-                     DEBUG = isHUDMenu ? -1 : config.debug;
+                     DEBUG = isHUDMenu ? (config.debugHUD != null ? config.debugHUD : -1) : config.debug;
+                     if(DEBUG < 0)
+                     {
+                        debug_tf.text = "";
+                     }
                      DISABLED = Boolean(config.disabled);
                      config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
                      config.lockPriorityTargetExcluded = [].concat(config.lockPriorityTargetExcluded);
@@ -321,14 +325,17 @@ package
          }
          if(this.refreshTargetTimer)
          {
+            this.refreshTargetTimer.stop();
             this.refreshTargetTimer.removeEventListener(TimerEvent.TIMER,this.updateTargetName);
          }
          if(this.lockTargetTimer)
          {
+            this.lockTargetTimer.stop();
             this.lockTargetTimer.removeEventListener(TimerEvent.TIMER,this.onLockTargetUpdate);
          }
          if(this.configTimer)
          {
+            this.configTimer.stop();
             this.configTimer.removeEventListener(TimerEvent.TIMER,this.loadConfig);
          }
          if(this.hudtools)
