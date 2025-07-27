@@ -439,6 +439,7 @@ package
             var sound:String = config.targetSoundIndicator[config.targetSoundIndicatorKeys[targetSoundId]];
             if(sound != "")
             {
+               displayMessage("Playing sound \"" + sound + "\" for target " + config.targetSoundIndicatorKeys[targetSoundId],2);
                GlobalFunc.PlayMenuSound(sound);
             }
          }
@@ -469,14 +470,6 @@ package
                {
                   this.refreshTargetTimer.reset();
                   this.targetName = "";
-                  if(config && config.showModMenu)
-                  {
-                     this.hudTools.CloseMenu();
-                  }
-               }
-               if(config && config.showModMenu && event.data.hudMode == HUDModes.PIPBOY)
-               {
-                  this.hudTools.ShowMenu();
                }
             }
          }
