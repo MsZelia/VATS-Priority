@@ -19,7 +19,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol91")]
    public class VATSMenu extends IMenu
    {
-       
       
       private const MAX_NEAREST_PARTS:uint = 4;
       
@@ -53,7 +52,7 @@ package
       
       public var SelectedPart:uint;
       
-      public var ResistanceData:Array;
+      public var ResistanceData:Array = new Array();
       
       private var ButtonDataA:Vector.<BSButtonHintData>;
       
@@ -79,8 +78,6 @@ package
       
       public function VATSMenu()
       {
-         this.PartSelectDistanceWeight = 0.3;
-         this.ResistanceData = new Array();
          this.CancelButton = new BSButtonHintData("$RETURN","Tab","PSN_B","Xenon_B",1,this.onCancelButtonClick);
          this.BodyPartButton = new BSButtonHintData("$PART","Mousewheel","PSN_RS","Xenon_RS",1,this.onBodyPartButtonClick);
          this.CycleTargetsButton = new BSButtonHintData("$TARGET","Z","_DPad_LR","_DPad_LR",1,this.onCycleTargetButtonClick);
@@ -219,9 +216,11 @@ package
                      {
                         _loc11_ = this.PartInfos[_loc10_].x - _loc9_.x;
                         _loc12_ = this.PartInfos[_loc10_].y - _loc9_.y;
-                        if((_loc13_ = _loc11_ * _loc11_ + _loc12_ * _loc12_) < _loc5_)
+                        _loc13_ = _loc11_ * _loc11_ + _loc12_ * _loc12_;
+                        if(_loc13_ < _loc5_)
                         {
-                           _loc15_ = (_loc14_ = new Point(_loc9_.x - this.PartInfos[_loc10_].x,_loc9_.y - this.PartInfos[_loc10_].y)).length;
+                           _loc14_ = new Point(_loc9_.x - this.PartInfos[_loc10_].x,_loc9_.y - this.PartInfos[_loc10_].y);
+                           _loc15_ = _loc14_.length;
                            _loc16_ = Math.max(0,_loc4_ - _loc15_);
                            if(_loc15_ > 0)
                            {
@@ -243,7 +242,8 @@ package
          _loc2_ = 0;
          while(_loc2_ < this.PartInfos.length)
          {
-            if((_loc18_ = Number(_loc7_[_loc2_].length)) > _loc6_ && _loc18_ > 0)
+            _loc18_ = Number(_loc7_[_loc2_].length);
+            if(_loc18_ > _loc6_ && _loc18_ > 0)
             {
                _loc18_ = _loc6_ / _loc18_;
                _loc7_[_loc2_].x *= _loc18_;
@@ -322,8 +322,8 @@ package
       
       public function ProcessPartSelectionInput(param1:Number, param2:Number, param3:Number) : *
       {
-         var _loc4_:Vector3D;
-         (_loc4_ = new Vector3D(param1,-param2)).normalize();
+         var _loc4_:Vector3D = new Vector3D(param1,-param2);
+         _loc4_.normalize();
          var _loc5_:Vector.<uint> = new Vector.<uint>();
          this.FindNearestParts(_loc5_,this.SelectedPart,_loc4_,param3);
          if(_loc5_.length > 0)
@@ -510,3 +510,4 @@ package
       }
    }
 }
+

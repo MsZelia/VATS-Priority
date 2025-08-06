@@ -5,7 +5,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol20")]
    public dynamic class BracketsHolder_33 extends MovieClip
    {
-       
       
       public function BracketsHolder_33()
       {
@@ -34,3 +33,4 @@ package VATSMenu_fla
       }
    }
 }
+

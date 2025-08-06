@@ -5,7 +5,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol84")]
    public dynamic class EncounterMeterIcon_19 extends MovieClip
    {
-       
       
       public function EncounterMeterIcon_19()
       {
@@ -29,3 +28,4 @@ package VATSMenu_fla
       }
    }
 }
+

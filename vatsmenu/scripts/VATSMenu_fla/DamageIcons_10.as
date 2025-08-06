@@ -5,7 +5,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol37")]
    public dynamic class DamageIcons_10 extends MovieClip
    {
-       
       
       public function DamageIcons_10()
       {
@@ -19,3 +18,4 @@ package VATSMenu_fla
       }
    }
 }
+

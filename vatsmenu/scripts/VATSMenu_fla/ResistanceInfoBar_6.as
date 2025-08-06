@@ -7,7 +7,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol88")]
    public dynamic class ResistanceInfoBar_6 extends MovieClip
    {
-       
       
       public var BackgroundInstance:MovieClip;
       
@@ -38,3 +37,4 @@ package VATSMenu_fla
       }
    }
 }
+

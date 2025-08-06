@@ -28,7 +28,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol72")]
    public dynamic class Fourleafclover_5 extends MovieClip
    {
-       
       
       public function Fourleafclover_5()
       {
@@ -49,3 +48,4 @@ package VATSMenu_fla
       }
    }
 }
+

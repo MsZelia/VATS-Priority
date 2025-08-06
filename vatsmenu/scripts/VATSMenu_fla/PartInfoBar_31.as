@@ -5,7 +5,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol7")]
    public dynamic class PartInfoBar_31 extends MovieClip
    {
-       
       
       public function PartInfoBar_31()
       {
@@ -29,3 +28,4 @@ package VATSMenu_fla
       }
    }
 }
+

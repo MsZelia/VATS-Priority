@@ -28,7 +28,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol55")]
    public dynamic class VaultboyBC_3 extends MovieClip
    {
-       
       
       public function VaultboyBC_3()
       {
@@ -49,3 +48,4 @@ package VATSMenu_fla
       }
    }
 }
+

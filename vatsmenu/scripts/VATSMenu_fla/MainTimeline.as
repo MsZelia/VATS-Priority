@@ -4,7 +4,6 @@ package VATSMenu_fla
    
    public dynamic class MainTimeline extends MovieClip
    {
-       
       
       public var MenuInstance:VATSMenu;
       
@@ -24,3 +23,4 @@ package VATSMenu_fla
       }
    }
 }
+

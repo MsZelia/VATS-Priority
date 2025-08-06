@@ -18,7 +18,6 @@ package
       internal static const BRACKET_WIDTH_INSET:Number = 12;
       
       internal static const BRACKET_HEIGHT_INSET:Number = 20;
-       
       
       public var GraphicInstance:MovieClip;
       
@@ -165,3 +164,4 @@ package
       }
    }
 }
+

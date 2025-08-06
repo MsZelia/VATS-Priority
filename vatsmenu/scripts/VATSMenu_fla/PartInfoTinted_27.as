@@ -5,7 +5,6 @@ package VATSMenu_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol15")]
    public dynamic class PartInfoTinted_27 extends MovieClip
    {
-       
       
       public var AnimationInstance:MovieClip;
       
@@ -26,3 +25,4 @@ package VATSMenu_fla
       }
    }
 }
+

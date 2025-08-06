@@ -6,7 +6,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol41")]
    public dynamic class ResistanceEntry extends MovieClip
    {
-       
       
       public var ImmunityIcon:MovieClip;
       
@@ -20,3 +19,4 @@ package
       }
    }
 }
+
