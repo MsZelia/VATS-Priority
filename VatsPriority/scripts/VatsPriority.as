@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.3";
+      public static const MOD_VERSION:String = "1.1.4";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -188,6 +188,21 @@ package
                         debug_tf.text = "";
                      }
                      DISABLED = Boolean(config.disabled);
+                     if(config.disableForTargets == null)
+                     {
+                        config.disableForTargets = [];
+                     }
+                     else
+                     {
+                        config.disableForTargets = [].concat(config.disableForTargets);
+                        for(target in config.disableForTargets)
+                        {
+                           if(config.disableForTargets[target])
+                           {
+                              config.disableForTargets[target] = config.disableForTargets[target].toUpperCase();
+                           }
+                        }
+                     }
                      config.lockPriorityTarget = Boolean(config.lockPriorityTarget);
                      config.lockPriorityTargetExcluded = [].concat(config.lockPriorityTargetExcluded);
                      config.useTargetNames = Boolean(config.useTargetNames);
@@ -531,6 +546,10 @@ package
             return;
          }
          if(!config || config.disabled || config.useTargetNames && this.targetName == "")
+         {
+            return;
+         }
+         if(config.useTargetNames && config.disableForTargets.indexOf(this.targetName) != -1)
          {
             return;
          }
