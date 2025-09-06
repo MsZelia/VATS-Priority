@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.4";
+      public static const MOD_VERSION:String = "1.1.5";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -66,6 +66,12 @@ package
       private var refreshTargetTimer:Timer;
       
       private var lockTargetTimer:Timer;
+      
+      private var perkCardsData:* = {};
+      
+      private var PerksUIData:*;
+      
+      private var hasCenterMasochist:Boolean = false;
       
       public function VatsPriority()
       {
@@ -152,7 +158,8 @@ package
             newData = {
                "partName":partData.toUpperCase(),
                "minHitChance":-1,
-               "notCrippled":false
+               "notCrippled":false,
+               "hasCenterMasochist":false
             };
          }
          else if(partData is Object)
@@ -160,7 +167,8 @@ package
             newData = {
                "partName":(partData.partName != null && partData.partName is String ? partData.partName.toUpperCase() : ""),
                "minHitChance":(partData.minHitChance != null && !isNaN(partData.minHitChance) ? partData.minHitChance : -1),
-               "notCrippled":Boolean(partData.notCrippled)
+               "notCrippled":Boolean(partData.notCrippled),
+               "hasCenterMasochist":Boolean(partData.hasCenterMasochist)
             };
          }
          return newData;
@@ -308,6 +316,7 @@ package
                this.topLevel = this.topLevel.getChildAt(0);
                if(Boolean(this.topLevel) && getQualifiedClassName(this.topLevel) == "VATSMenu")
                {
+                  this.initPerkCards();
                   this.loadConfig();
                   this.hudTools = new SharedHUDTools(MOD_NAME);
                   this.hudTools.Register(this.onReceiveMessage);
@@ -519,6 +528,46 @@ package
          }
       }
       
+      private function initPerkCards(event:*) : void
+      {
+         var i:int;
+         try
+         {
+            this.PerksUIData = BSUIDataManager.GetDataFromClient("PerksUIData").data;
+            if(PerksUIData == null || PerksUIData.perkCardDataA == null || PerksUIData.perkCardDataA.length == 0)
+            {
+               return;
+            }
+            i = 0;
+            while(i < PerksUIData.perkCardDataA.length)
+            {
+               if(PerksUIData.perkCardDataA[i].clipName == "Commando" && PerksUIData.perkCardDataA[i].equipped)
+               {
+                  this.hasCenterMasochist = true;
+                  displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,2);
+                  return;
+               }
+               i++;
+            }
+            i = 0;
+            while(i < PerksUIData.teammateCardDataA.length)
+            {
+               if(PerksUIData.teammateCardDataA[i].clipName == "Commando" && PerksUIData.teammateCardDataA[i].equipped)
+               {
+                  this.hasCenterMasochist = true;
+                  displayMessage("teammate hasCenterMasochist: " + this.hasCenterMasochist,2);
+                  return;
+               }
+               i++;
+            }
+            displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,2);
+         }
+         catch(e:*)
+         {
+            displayMessage("Error fetching perk cards: " + e,0);
+         }
+      }
+      
       public function onRefreshActionDisplay(event:Event) : void
       {
          if(!isTargetLocked())
@@ -655,6 +704,10 @@ package
          if(part != null)
          {
             if(altConf.notCrippled && part.HealthBarIndicator.scaleX == 0)
+            {
+               return false;
+            }
+            if(altConf.hasCenterMasochist && !this.hasCenterMasochist)
             {
                return false;
             }
