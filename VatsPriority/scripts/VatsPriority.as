@@ -78,6 +78,7 @@ package
          super();
          this.createDebugTf();
          addEventListener(Event.ADDED_TO_STAGE,this.addedToStageHandler,false,0,true);
+         this.PerksUIData = BSUIDataManager.GetDataFromClient("PerksUIData").data;
       }
       
       public static function toString(param1:Object) : String
@@ -263,6 +264,7 @@ package
                      }
                      displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
                      displayMessage(toString(config),2);
+                     initPerkCards();
                      setPriority();
                      lastConfig = loader.data;
                   }
@@ -316,7 +318,6 @@ package
                this.topLevel = this.topLevel.getChildAt(0);
                if(Boolean(this.topLevel) && getQualifiedClassName(this.topLevel) == "VATSMenu")
                {
-                  this.initPerkCards();
                   this.loadConfig();
                   this.hudTools = new SharedHUDTools(MOD_NAME);
                   this.hudTools.Register(this.onReceiveMessage);
@@ -324,6 +325,7 @@ package
                   stage.addEventListener(EVENT_VATS_PRIORITY_REFRESH,this.onRefreshActionDisplay,false,0,true);
                   stage.addEventListener(EVENT_VATS_PRIORITY_UPDATE_TARGET,this.onTargetChanged,false,0,true);
                   trace(MOD_NAME + " added to VATSMenu");
+                  BSUIDataManager.Subscribe("PerksUIData",this.initPerkCards);
                }
                else
                {
@@ -533,7 +535,6 @@ package
          var i:int;
          try
          {
-            this.PerksUIData = BSUIDataManager.GetDataFromClient("PerksUIData").data;
             if(PerksUIData == null || PerksUIData.perkCardDataA == null || PerksUIData.perkCardDataA.length == 0)
             {
                return;
@@ -544,7 +545,7 @@ package
                if(PerksUIData.perkCardDataA[i].clipName == "Commando" && PerksUIData.perkCardDataA[i].equipped)
                {
                   this.hasCenterMasochist = true;
-                  displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,2);
+                  displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,1);
                   return;
                }
                i++;
@@ -555,12 +556,12 @@ package
                if(PerksUIData.teammateCardDataA[i].clipName == "Commando" && PerksUIData.teammateCardDataA[i].equipped)
                {
                   this.hasCenterMasochist = true;
-                  displayMessage("teammate hasCenterMasochist: " + this.hasCenterMasochist,2);
+                  displayMessage("teammate hasCenterMasochist: " + this.hasCenterMasochist,1);
                   return;
                }
                i++;
             }
-            displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,2);
+            displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,1);
          }
          catch(e:*)
          {
