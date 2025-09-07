@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.5";
+      public static const MOD_VERSION:String = "1.1.6";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -72,6 +72,8 @@ package
       private var PerksUIData:*;
       
       private var hasCenterMasochist:Boolean = false;
+      
+      private var hasTormentor:Boolean = false;
       
       public function VatsPriority()
       {
@@ -160,7 +162,8 @@ package
                "partName":partData.toUpperCase(),
                "minHitChance":-1,
                "notCrippled":false,
-               "hasCenterMasochist":false
+               "hasCenterMasochist":false,
+               "hasTormentor":false
             };
          }
          else if(partData is Object)
@@ -169,7 +172,8 @@ package
                "partName":(partData.partName != null && partData.partName is String ? partData.partName.toUpperCase() : ""),
                "minHitChance":(partData.minHitChance != null && !isNaN(partData.minHitChance) ? partData.minHitChance : -1),
                "notCrippled":Boolean(partData.notCrippled),
-               "hasCenterMasochist":Boolean(partData.hasCenterMasochist)
+               "hasCenterMasochist":Boolean(partData.hasCenterMasochist),
+               "hasTormentor":Boolean(partData.hasTormentor)
             };
          }
          return newData;
@@ -542,26 +546,47 @@ package
             i = 0;
             while(i < PerksUIData.perkCardDataA.length)
             {
-               if(PerksUIData.perkCardDataA[i].clipName == "Commando" && PerksUIData.perkCardDataA[i].equipped)
+               if(PerksUIData.perkCardDataA[i].equipped)
                {
-                  this.hasCenterMasochist = true;
-                  displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,1);
-                  return;
+                  if(PerksUIData.perkCardDataA[i].clipName == "Commando")
+                  {
+                     this.hasCenterMasochist = true;
+                     displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,1);
+                  }
+                  else if(PerksUIData.perkCardDataA[i].clipName == "Tormentor")
+                  {
+                     this.hasTormentor = true;
+                     displayMessage("hasTormentor: " + this.hasTormentor,1);
+                  }
                }
                i++;
             }
             i = 0;
             while(i < PerksUIData.teammateCardDataA.length)
             {
-               if(PerksUIData.teammateCardDataA[i].clipName == "Commando" && PerksUIData.teammateCardDataA[i].equipped)
+               if(PerksUIData.teammateCardDataA[i].equipped)
                {
-                  this.hasCenterMasochist = true;
-                  displayMessage("teammate hasCenterMasochist: " + this.hasCenterMasochist,1);
-                  return;
+                  if(PerksUIData.teammateCardDataA[i].clipName == "Commando")
+                  {
+                     this.hasCenterMasochist = true;
+                     displayMessage("teammate hasCenterMasochist: " + this.hasCenterMasochist,1);
+                  }
+                  else if(PerksUIData.teammateCardDataA[i].clipName == "Tormentor")
+                  {
+                     this.hasTormentor = true;
+                     displayMessage("hasTormentor: " + this.hasTormentor,1);
+                  }
                }
                i++;
             }
-            displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,1);
+            if(!this.hasCenterMasochist)
+            {
+               displayMessage("hasCenterMasochist: false",1);
+            }
+            if(!this.hasTormentor)
+            {
+               displayMessage("hasTormentor: false",1);
+            }
          }
          catch(e:*)
          {
@@ -709,6 +734,10 @@ package
                return false;
             }
             if(altConf.hasCenterMasochist && !this.hasCenterMasochist)
+            {
+               return false;
+            }
+            if(altConf.hasTormentor && !this.hasTormentor)
             {
                return false;
             }
