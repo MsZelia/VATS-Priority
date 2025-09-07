@@ -162,8 +162,8 @@ package
                "partName":partData.toUpperCase(),
                "minHitChance":-1,
                "notCrippled":false,
-               "hasCenterMasochist":false,
-               "hasTormentor":false
+               "hasCenterMasochist":null,
+               "hasTormentor":null
             };
          }
          else if(partData is Object)
@@ -172,8 +172,8 @@ package
                "partName":(partData.partName != null && partData.partName is String ? partData.partName.toUpperCase() : ""),
                "minHitChance":(partData.minHitChance != null && !isNaN(partData.minHitChance) ? partData.minHitChance : -1),
                "notCrippled":Boolean(partData.notCrippled),
-               "hasCenterMasochist":Boolean(partData.hasCenterMasochist),
-               "hasTormentor":Boolean(partData.hasTormentor)
+               "hasCenterMasochist":partData.hasCenterMasochist,
+               "hasTormentor":partData.hasTormentor
             };
          }
          return newData;
@@ -733,13 +733,27 @@ package
             {
                return false;
             }
-            if(altConf.hasCenterMasochist && !this.hasCenterMasochist)
+            if(altConf.hasCenterMasochist is Boolean)
             {
-               return false;
+               if(altConf.hasCenterMasochist && !this.hasCenterMasochist)
+               {
+                  return false;
+               }
+               if(!altConf.hasCenterMasochist && this.hasCenterMasochist)
+               {
+                  return false;
+               }
             }
-            if(altConf.hasTormentor && !this.hasTormentor)
+            if(altConf.hasTormentor is Boolean)
             {
-               return false;
+               if(altConf.hasTormentor && !this.hasTormentor)
+               {
+                  return false;
+               }
+               if(!altConf.hasTormentor && this.hasTormentor)
+               {
+                  return false;
+               }
             }
             if(Number(part.ChanceToHit.text.replace("%","")) < altConf.minHitChance)
             {
