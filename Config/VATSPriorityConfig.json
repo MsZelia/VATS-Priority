@@ -1,0 +1,159 @@
+{
+	"debug": 1,
+	"disabled": false,
+	"disableForTargets": [],
+	
+	"lockPriorityTarget": false,
+	"lockPriorityTargetExcluded": ["SENTRY BOT", "ULTRACITE TERROR", "STORM GOLIATH", "CARGOBOT", "ASSAULTRON", "EN06 GUARDIAN", "DEATHCLAW", "SCORCHBEAST QUEEN", "GRIMM BOT", "SHERIFF BOT"],
+	
+	"useTargetSoundIndicator": false,
+	"targetSoundIndicator": {
+		"¬": "UILegendaryCreature",
+		"LEGENDARY": "UILegendaryCreature",
+		"ANOTHER EXAMPLE TARGET": "UITargetingComputerMapTargetConfirm"
+	},
+	
+	"useTargetNames": true, // Requires HUDModLoader + HUDTools
+	
+	"defaultPriority": [
+		{"partName": "HEAD", "minHitChance": 1},
+		{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+		{"minHitChance": 80},
+		{"minHitChance": 60},
+		{"minHitChance": 40},
+		{"minHitChance": 20},
+		{"minHitChance": 1}
+	],
+	"priorities": {
+		"SENTRY BOT": [
+			{"partName": "FUSION CORE", "minHitChance": 5},
+			{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+			{"partName": "ARM", "minHitChance": 1}
+		],
+		"GRIMM BOT": [
+			{"partName": "FUSION CORE", "minHitChance": 5},
+			{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+			{"partName": "ARM", "minHitChance": 1}
+		],
+		"SHERIFF BOT": [
+			{"partName": "FUSION CORE", "minHitChance": 5},
+			{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+			{"partName": "ARM", "minHitChance": 1}
+		],
+		"SECURITY ROBOT": [
+			{"partName": "FUSION CORE", "minHitChance": 5},
+			{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+			{"partName": "ARM", "minHitChance": 1}
+		],
+		"TURRET": [
+			{"partName": "BARREL", "minHitChance": 1},
+			{"partName": "MOTORS", "minHitChance": 1}
+		],
+		"GUTSY": [
+			{"partName": "THRUSTER", "minHitChance": 1},
+			{"partName": "EYE", "minHitChance": 1}
+		],
+		"NANNY": [
+			{"partName": "THRUSTER", "minHitChance": 1},
+			{"partName": "EYE", "minHitChance": 1}
+		],
+		"HANDY": [
+			{"partName": "THRUSTER", "minHitChance": 1},
+			{"partName": "EYE", "minHitChance": 1}
+		],
+		"ULTRACITE TERROR": [
+			{"partName": "RIGHTEYE", "minHitChance": 60},
+			{"partName": "LEFTEYE", "minHitChance": 60},
+			{"partName": "RIGHTEYE", "minHitChance": 40},
+			{"partName": "LEFTEYE", "minHitChance": 40},
+			{"partName": "RIGHTEYE", "minHitChance": 20},
+			{"partName": "LEFTEYE", "minHitChance": 20},
+			{"partName": "RIGHTEYE", "minHitChance": 10},
+			{"partName": "LEFTEYE", "minHitChance": 10}
+		],
+		"FLOATER": [
+			{"partName": "EYES", "minHitChance": 1}
+		],
+		"POLLINATOR": [
+			{"partName": "EYES", "minHitChance": 1}
+		],
+		"STORM GOLIATH": [
+			{"partName": "GLASS", "notCrippled": true, "minHitChance": 1},
+			{"partName": "BACK PANEL", "notCrippled": true, "minHitChance": 1},
+			{"partName": "LEFT", "notCrippled": true, "minHitChance": 1},
+			{"partName": "RIGHT", "notCrippled": true, "minHitChance": 1},
+			{"partName": "TORSO", "notCrippled": true, "minHitChance": 1},
+			{"partName": "TORSO", "hasCenterMasochist": true},
+			{"partName": "GLASS", "minHitChance": 1}
+		],
+		"EYEBOT": [
+			{"partName": "BACK PANEL", "minHitChance": 25},
+			{"partName": "ANTENNA", "minHitChance": 1}
+		],
+		"EYEBOMB": [
+			{"partName": "BACK PANEL", "minHitChance": 25},
+			{"partName": "ANTENNA", "minHitChance": 1}
+		],
+		"REPAIR BOT": [
+			{"partName": "BACK PANEL", "minHitChance": 25},
+			{"partName": "ANTENNA", "minHitChance": 1}
+		],
+		"CARGOBOT": [
+			{"partName": "BOOSTER", "notCrippled": true, "minHitChance": 1}
+		],
+		"ASSAULTRON": [
+			{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+			{"partName": "RIGHT LEG", "notCrippled": true, "minHitChance": 1},
+			{"partName": "LEFT LEG", "minHitChance": 1}
+		],
+		"IMPOSTER SHEEPSQUATCH": [
+			{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+			{"partName": "RIGHT LEG", "notCrippled": true, "minHitChance": 1},
+			{"partName": "LEFT LEG", "minHitChance": 1}
+		],
+		"VERTIBIRD": [
+			{"partName": "CABIN", "minHitChance": 1}
+		],
+		"EN06 GUARDIAN": [
+			{"partName": "ULTRAGENETIC SHIELD", "notCrippled": true, "minHitChance": 1},
+			"TORSO"
+		],
+		"GRAFTON MONSTER": [
+			{"partName": "BLOWHOLE", "minHitChance": 1},
+			{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
+			{"partName": "ARM", "minHitChance": 1}
+		],
+		"RADSCORPION": [
+			{"partName": "FACE", "minHitChance": 1}
+		],
+		"DEATHCLAW": [
+			{"partName": "BELLY", "minHitChance": 1}
+		],
+		"SCORCHBEAST QUEEN": [
+			{"partName": "WING", "notCrippled": true}
+		],
+		"MIRELURK QUEEN": [
+			{"partName": "SPOUTS", "minHitChance": 1},
+			{"partName": "LEG", "minHitChance": 1}
+		],
+		"STRANGLER QUEEN": [
+			{"partName": "SPOUTS", "minHitChance": 1},
+			{"partName": "LEG", "minHitChance": 1}
+		],
+		"ALIEN DRONE": [
+			{"partName": "BODY"}
+		],
+		"CAPTAIN ALPHA": [
+			{"partName": "BODY"}
+		],
+		"CAPTAIN OMEGA": [
+			{"partName": "BODY"}
+		],
+		"ALIEN INVADER": [
+			{"partName": "TORSO"}
+		],
+		"GENERAL ZETA": [
+			{"partName": "TORSO"}
+		]
+	}
+}
