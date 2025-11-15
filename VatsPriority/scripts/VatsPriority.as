@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.8";
+      public static const MOD_VERSION:String = "1.1.9";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -190,6 +190,7 @@ package
             loaderComplete = function(param1:Event):void
             {
                var _alt:*;
+               var newFormat:TextFormat;
                try
                {
                   if(lastConfig != loader.data)
@@ -265,6 +266,25 @@ package
                               config.targetSoundIndicator[targetSound] = "";
                            }
                         }
+                     }
+                     if(config.uiConfig)
+                     {
+                        config.uiConfig.x = Parser.parseNumber(config.uiConfig.x,20);
+                        config.uiConfig.y = Parser.parseNumber(config.uiConfig.y,20);
+                        config.uiConfig.textColor = Parser.parseNumber(config.uiConfig.textColor,16777215);
+                        config.uiConfig.textSize = Parser.parseNumber(config.uiConfig.textSize,12);
+                        config.uiConfig.textFont = Boolean(config.uiConfig.textFont) ? config.uiConfig.textFont : "$MAIN_Font";
+                        config.uiConfig.textAlign = Boolean(config.uiConfig.textAlign) ? config.uiConfig.textAlign.toLowerCase() : "left";
+                        config.uiConfig.textShadow = Parser.parseBoolean(config.uiConfig.textShadow,false);
+                        newFormat = new TextFormat(config.uiConfig.textFont,config.uiConfig.textSize,config.uiConfig.textColor);
+                        newFormat.align = config.uiConfig.textAlign;
+                        debug_tf.x = config.uiConfig.x;
+                        debug_tf.y = config.uiConfig.y;
+                        debug_tf.width = 1280 - config.uiConfig.x;
+                        debug_tf.height = 720 - config.uiConfig.y;
+                        debug_tf.defaultTextFormat = newFormat;
+                        debug_tf.setTextFormat(newFormat);
+                        debug_tf.filters = config.uiConfig.textShadow ? [new DropShadowFilter(2,45,0,1,1,1,1,BitmapFilterQuality.HIGH)] : [];
                      }
                      displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
                      displayMessage(toString(config),2);
