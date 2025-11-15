@@ -1,5 +1,18 @@
 {
 	"debug": 1,
+	
+	"uiConfig": {
+		"x": 20,
+		"y": 20,
+		"textSize": 12,
+		"textFont": "$MAIN_Font",
+		"textAlign": "left",
+		"textColor": "0xffffff",
+		"textShadow": false,
+		"hideResistances": false,
+		"hideButtons": false
+	},
+	
 	"disabled": false,
 	"disableForTargets": [],
 	
