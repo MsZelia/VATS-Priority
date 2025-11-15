@@ -285,6 +285,19 @@ package
                         debug_tf.defaultTextFormat = newFormat;
                         debug_tf.setTextFormat(newFormat);
                         debug_tf.filters = config.uiConfig.textShadow ? [new DropShadowFilter(2,45,0,1,1,1,1,BitmapFilterQuality.HIGH)] : [];
+                        if(config.uiConfig.hideButtons)
+                        {
+                           topLevel.HideButtonHelp();
+                           if(!config.uiConfig.hideResistances)
+                           {
+                              topLevel.SetResistancesVisible(true);
+                           }
+                        }
+                        if(config.uiConfig.hideResistances)
+                        {
+                           topLevel.ResistancesInstance.scaleY = 0;
+                           topLevel.ResistanceBracketsInstance.scaleY = 0;
+                        }
                      }
                      displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
                      displayMessage(toString(config),2);
