@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.1.9";
+      public static const MOD_VERSION:String = "1.2.0";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -71,9 +71,13 @@ package
       
       private var PerksUIData:*;
       
+      private var HUDModeData:*;
+      
       private var hasCenterMasochist:Boolean = false;
       
       private var hasTormentor:Boolean = false;
+      
+      private var opacityTimer:Timer = new Timer(20);
       
       public function VatsPriority()
       {
@@ -81,6 +85,8 @@ package
          this.createDebugTf();
          addEventListener(Event.ADDED_TO_STAGE,this.addedToStageHandler,false,0,true);
          this.PerksUIData = BSUIDataManager.GetDataFromClient("PerksUIData").data;
+         this.HUDModeData = BSUIDataManager.GetDataFromClient("HUDModeData").data;
+         this.opacityTimer.addEventListener(TimerEvent.TIMER,this.setOpacity);
       }
       
       public static function toString(param1:Object) : String
@@ -298,6 +304,10 @@ package
                            topLevel.ResistancesInstance.scaleY = 0;
                            topLevel.ResistanceBracketsInstance.scaleY = 0;
                         }
+                        if(!isHUDMenu && config.uiConfig.tieToHUDOpacity)
+                        {
+                           opacityTimer.start();
+                        }
                      }
                      displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
                      displayMessage(toString(config),2);
@@ -399,6 +409,11 @@ package
          {
             this.configTimer.stop();
             this.configTimer.removeEventListener(TimerEvent.TIMER,this.loadConfig);
+         }
+         if(this.opacityTimer)
+         {
+            this.opacityTimer.stop();
+            this.opacityTimer.removeEventListener(TimerEvent.TIMER,this.setOpacity);
          }
          if(this.hudtools)
          {
@@ -808,6 +823,27 @@ package
             return indexOfCaseInsensitiveString(config.lockPriorityTargetExcluded,this.targetName) == -1;
          }
          return indexOfCaseInsensitiveString(config.lockPriorityTargetExcluded,this.targetName) != -1;
+      }
+      
+      private function setOpacity() : void
+      {
+         var opacity:Number;
+         try
+         {
+            if(!this.isHUDMenu && this.HUDModeData && this.HUDModeData.hudOpacity != null)
+            {
+               opacity = Math.max(this.HUDModeData.hudOpacity,0.0001);
+               stage.getChildAt(0).alpha = opacity;
+               if(opacity < 0.01)
+               {
+                  this.topLevel.HideButtonHelp();
+               }
+            }
+         }
+         catch(e:*)
+         {
+            displayMessage("Error setOpacity: " + e,0);
+         }
       }
       
       public function showHUDChildren() : void
