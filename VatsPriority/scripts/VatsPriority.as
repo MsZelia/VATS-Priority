@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.2.0";
+      public static const MOD_VERSION:String = "1.2.1";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -67,7 +67,7 @@ package
       
       private var lockTargetTimer:Timer;
       
-      private var perkCardsData:* = {};
+      private var perkCardsDataInitialized:Boolean = false;
       
       private var PerksUIData:*;
       
@@ -587,7 +587,7 @@ package
          var i:int;
          try
          {
-            if(PerksUIData == null || PerksUIData.perkCardDataA == null || PerksUIData.perkCardDataA.length == 0)
+            if(this.perkCardsDataInitialized || PerksUIData == null || PerksUIData.perkCardDataA == null || PerksUIData.perkCardDataA.length == 0)
             {
                return;
             }
@@ -635,6 +635,7 @@ package
             {
                displayMessage("hasTormentor: false",1);
             }
+            this.perkCardsDataInitialized = true;
          }
          catch(e:*)
          {
