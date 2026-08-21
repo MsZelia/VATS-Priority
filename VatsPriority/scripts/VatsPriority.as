@@ -23,7 +23,7 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.2.6";
+      public static const MOD_VERSION:String = "1.2.7";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
@@ -197,11 +197,12 @@ package
             {
                var _alt:*;
                var newFormat:TextFormat;
+               var line:uint;
                try
                {
                   if(lastConfig != loader.data)
                   {
-                     config = new JSONDecoder(loader.data,true).getValue();
+                     config = new JSONDecoder(loader.data,false).getValue();
                      DEBUG = isHUDMenu ? (config.debugHUD != null ? config.debugHUD : -1) : config.debug;
                      if(DEBUG < 0)
                      {
@@ -316,16 +317,21 @@ package
                      lastConfig = loader.data;
                   }
                }
+               catch(e:JSONParseError)
+               {
+                  line = e.text.substr(0,e.location).match(/\n/g).length + 1;
+                  displayMessage(FULL_MOD_NAME + " | Error parsing config: " + e.message + " in line " + line,0);
+               }
                catch(e:Error)
                {
-                  displayMessage(FULL_MOD_NAME + " | Error parsing config: " + e,0);
+                  displayMessage(FULL_MOD_NAME + " | Error initializing config: " + e,0);
                }
                loader.removeEventListener(Event.COMPLETE,loaderComplete);
                loader.removeEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
             };
-            ioErrorHandler = function(param1:Event):void
+            ioErrorHandler = function(e:IOErrorEvent):void
             {
-               displayMessage(FULL_MOD_NAME + " | Error loading config :: " + param1.text,0);
+               displayMessage(FULL_MOD_NAME + " | Error loading config:: " + e.text,0);
                loader.removeEventListener(Event.COMPLETE,loaderComplete);
                loader.removeEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
             };
