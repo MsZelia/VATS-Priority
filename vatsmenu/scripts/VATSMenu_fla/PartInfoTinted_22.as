@@ -3,12 +3,12 @@ package VATSMenu_fla
    import flash.display.MovieClip;
    
    [Embed(source="/_assets/assets.swf", symbol="symbol15")]
-   public dynamic class PartInfoTinted_27 extends MovieClip
+   public dynamic class PartInfoTinted_22 extends MovieClip
    {
       
       public var AnimationInstance:MovieClip;
       
-      public function PartInfoTinted_27()
+      public function PartInfoTinted_22()
       {
          super();
          addFrameScript(0,this.frame1,29,this.frame30);

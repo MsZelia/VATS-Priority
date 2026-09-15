@@ -2,14 +2,14 @@ package VATSMenu_fla
 {
    import flash.display.MovieClip;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol84")]
-   public dynamic class EncounterMeterIcon_19 extends MovieClip
+   [Embed(source="/_assets/assets.swf", symbol="symbol20")]
+   public dynamic class BracketsHolder_28 extends MovieClip
    {
       
-      public function EncounterMeterIcon_19()
+      public function BracketsHolder_28()
       {
          super();
-         addFrameScript(0,this.frame1,1,this.frame2,2,this.frame3);
+         addFrameScript(0,this.frame1,1,this.frame2,2,this.frame3,3,this.frame4);
       }
       
       internal function frame1() : *
@@ -23,6 +23,11 @@ package VATSMenu_fla
       }
       
       internal function frame3() : *
+      {
+         stop();
+      }
+      
+      internal function frame4() : *
       {
          stop();
       }

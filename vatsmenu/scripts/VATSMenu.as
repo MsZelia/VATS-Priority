@@ -10,13 +10,12 @@ package
    import flash.display.StageAlign;
    import flash.events.*;
    import flash.geom.Point;
-   import flash.geom.Rectangle;
    import flash.geom.Vector3D;
    import flash.net.*;
    import flash.system.*;
    import flash.text.TextFieldAutoSize;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol91")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol82")]
    public class VATSMenu extends IMenu
    {
       
@@ -29,8 +28,6 @@ package
       private const STAGE_HEIGHT:uint = 720;
       
       private const STAGE_RATIO:Number = 1.7777777777777777;
-      
-      private const ALIGNMENT_OFFSET:Number = 7;
       
       public var PartSelectDistanceWeight:Number = 0.3;
       
@@ -45,8 +42,6 @@ package
       public var ResistancesInstance:MovieClip;
       
       public var ResistanceBracketsInstance:MovieClip;
-      
-      public var BossIcon_mc:MovieClip;
       
       public var PartInfos:Array;
       
@@ -490,22 +485,17 @@ package
          stage.dispatchEvent(new Event("VatsPriority::UpdateTargetInfo"));
       }
       
-      public function SetTargetLevel(param1:uint, param2:uint, param3:Boolean) : *
+      public function SetTargetLevel(param1:uint, param2:Boolean) : *
       {
-         var _loc4_:Rectangle = null;
-         if(param2 > 0)
-         {
-            this.ResistancesInstance.gotoAndStop("Skull");
-            this.ResistancesInstance.Skull.gotoAndStop(param2);
-            this.ResistancesInstance.BossIcon_mc.visible = param3;
-            this.ResistancesInstance.Level.text = "";
-            _loc4_ = this.ResistancesInstance.Skull.getBounds(this.ResistancesInstance);
-            this.ResistancesInstance.BossIcon_mc.x = _loc4_.x + _loc4_.width / 2 - this.ResistancesInstance.BossIcon_mc.width / 2 + this.ALIGNMENT_OFFSET;
-         }
-         else
+         if(param2)
          {
             this.ResistancesInstance.gotoAndStop("Level");
             this.ResistancesInstance.Level.text = param1;
+         }
+         else
+         {
+            this.ResistancesInstance.gotoAndStop("Hidden");
+            this.ResistancesInstance.Level.text = "";
          }
       }
    }

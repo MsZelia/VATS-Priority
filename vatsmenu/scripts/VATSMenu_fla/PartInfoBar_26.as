@@ -2,14 +2,14 @@ package VATSMenu_fla
 {
    import flash.display.MovieClip;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol20")]
-   public dynamic class BracketsHolder_33 extends MovieClip
+   [Embed(source="/_assets/assets.swf", symbol="symbol7")]
+   public dynamic class PartInfoBar_26 extends MovieClip
    {
       
-      public function BracketsHolder_33()
+      public function PartInfoBar_26()
       {
          super();
-         addFrameScript(0,this.frame1,1,this.frame2,2,this.frame3,3,this.frame4);
+         addFrameScript(0,this.frame1,1,this.frame2,2,this.frame3);
       }
       
       internal function frame1() : *
@@ -23,11 +23,6 @@ package VATSMenu_fla
       }
       
       internal function frame3() : *
-      {
-         stop();
-      }
-      
-      internal function frame4() : *
       {
          stop();
       }
