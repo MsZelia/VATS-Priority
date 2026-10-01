@@ -81,6 +81,10 @@ package
       
       private var opacityTimer:Timer = new Timer(20);
       
+      private var crippleTimer:Timer = new Timer(20);
+      
+      private var lastLimbHP:int = 0;
+      
       public function VatsPriority()
       {
          super();
@@ -89,6 +93,7 @@ package
          this.PerksUIData = BSUIDataManager.GetDataFromClient("PerksUIData").data;
          this.HUDModeData = BSUIDataManager.GetDataFromClient("HUDModeData").data;
          this.opacityTimer.addEventListener(TimerEvent.TIMER,this.setOpacity);
+         this.crippleTimer.addEventListener(TimerEvent.TIMER,this.checkCrippleState);
       }
       
       public static function toString(param1:Object) : String
@@ -313,6 +318,10 @@ package
                         }
                      }
                      config.delayPriorityChecking = isNaN(config.delayPriorityChecking) ? DEFAULT_DELAY : Math.max(config.delayPriorityChecking,DEFAULT_DELAY);
+                     if(!isHUDMenu && Boolean(config.recheckPrioritiesOnLimbCripple))
+                     {
+                        crippleTimer.start();
+                     }
                      displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
                      displayMessage(toString(config),3);
                      initPerkCards();
@@ -423,6 +432,11 @@ package
          {
             this.opacityTimer.stop();
             this.opacityTimer.removeEventListener(TimerEvent.TIMER,this.setOpacity);
+         }
+         if(this.crippleTimer)
+         {
+            this.crippleTimer.stop();
+            this.crippleTimer.removeEventListener(TimerEvent.TIMER,this.checkCrippleState);
          }
          if(this.hudTools)
          {
@@ -670,6 +684,36 @@ package
          }
          displayMessage("TargetChanged",2);
          setTimeout(this.setPriority,config.delayPriorityChecking);
+      }
+      
+      public function checkCrippleState() : void
+      {
+         if(config.recheckPrioritiesOnLimbCripple == "hasTormentor" && !this.hasTormentor)
+         {
+            return;
+         }
+         if(this.topLevel.PartInfos && this.topLevel.PartInfos.length > this.topLevel.SelectedPart)
+         {
+            var selectedPart:Object = this.topLevel.PartInfos[this.topLevel.SelectedPart];
+            var limbHP:int = Math.ceil(selectedPart.HealthBarIndicator.scaleX * 100);
+            if(this.lastLimbHP > 0 && limbHP != this.lastLimbHP)
+            {
+               if(limbHP == 0)
+               {
+                  displayMessage(selectedPart.NameTextField.text.toUpperCase() + " crippled, rechecking priorities!",1);
+                  this.setPriority();
+               }
+               else
+               {
+                  displayMessage(selectedPart.NameTextField.text.toUpperCase() + " not crippled (" + limbHP + "%)",2);
+               }
+            }
+            this.lastLimbHP = limbHP;
+         }
+         else
+         {
+            this.lastLimbHP = 0;
+         }
       }
       
       public function setPriority(logMsg:Boolean = true) : void
