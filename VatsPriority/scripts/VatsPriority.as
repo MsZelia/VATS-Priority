@@ -81,7 +81,7 @@ package
       
       private var opacityTimer:Timer = new Timer(20);
       
-      private var crippleTimer:Timer = new Timer(20);
+      private var crippleTimer:Timer = new Timer(50);
       
       private var lastLimbHP:int = 0;
       
@@ -688,6 +688,10 @@ package
       
       public function checkCrippleState() : void
       {
+         if(isTargetLocked())
+         {
+            return;
+         }
          if(config.recheckPrioritiesOnLimbCripple == "hasTormentor" && !this.hasTormentor)
          {
             return;
