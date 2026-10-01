@@ -29,6 +29,10 @@
 	
 	"useTargetNames": true, // Requires HUDModLoader + HUDTools
 	
+	"delayPriorityChecking": 50,
+	
+	"recheckPrioritiesOnLimbCripple": true, // options: false, true, "hasTormentor"
+	
 	"defaultPriority": [
 		{"partName": "HEAD", "minHitChance": 1},
 		{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
