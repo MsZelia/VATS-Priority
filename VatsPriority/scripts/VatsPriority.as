@@ -23,13 +23,15 @@ package
       
       public static const MOD_NAME:String = "VATSPriority";
       
-      public static const MOD_VERSION:String = "1.2.8";
+      public static const MOD_VERSION:String = "1.2.9";
       
       public static const FULL_MOD_NAME:String = MOD_NAME + " " + MOD_VERSION;
       
       public static const CONFIG_FILE:String = "../VATSPriorityConfig.json";
       
       public static const CONFIG_RELOAD_TIME:uint = 10500;
+      
+      public static const DEFAULT_DELAY:uint = 50;
       
       public static const HUD_TOOLS_SENDER_NAME:String = MOD_NAME + "_HUD";
       
@@ -310,11 +312,12 @@ package
                            opacityTimer.start();
                         }
                      }
+                     config.delayPriorityChecking = isNaN(config.delayPriorityChecking) ? DEFAULT_DELAY : Math.max(config.delayPriorityChecking,DEFAULT_DELAY);
                      displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
-                     displayMessage(toString(config),2);
+                     displayMessage(toString(config),3);
                      initPerkCards();
-                     setPriority();
                      lastConfig = loader.data;
+                     setTimeout(setPriority,config.delayPriorityChecking);
                   }
                }
                catch(e:JSONParseError)
@@ -421,9 +424,9 @@ package
             this.opacityTimer.stop();
             this.opacityTimer.removeEventListener(TimerEvent.TIMER,this.setOpacity);
          }
-         if(this.hudtools)
+         if(this.hudTools)
          {
-            this.hudtools.Shutdown();
+            this.hudTools.Shutdown();
          }
       }
       
@@ -578,7 +581,7 @@ package
                {
                   this.targetName = msg.toUpperCase();
                   displayMessage("Target name set to: \"" + this.targetName + "\"",1);
-                  setTimeout(this.setPriority,20);
+                  setTimeout(this.setPriority,config.delayPriorityChecking);
                }
             }
          }
@@ -605,12 +608,12 @@ package
                   if(PerksUIData.perkCardDataA[i].clipName == "Commando")
                   {
                      this.hasCenterMasochist = true;
-                     displayMessage("hasCenterMasochist: " + this.hasCenterMasochist,1);
+                     displayMessage("hasCenterMasochist: true",1);
                   }
                   else if(PerksUIData.perkCardDataA[i].clipName == "Tormentor")
                   {
                      this.hasTormentor = true;
-                     displayMessage("hasTormentor: " + this.hasTormentor,1);
+                     displayMessage("hasTormentor: true",1);
                   }
                }
                i++;
@@ -623,12 +626,12 @@ package
                   if(PerksUIData.teammateCardDataA[i].clipName == "Commando")
                   {
                      this.hasCenterMasochist = true;
-                     displayMessage("teammate hasCenterMasochist: " + this.hasCenterMasochist,1);
+                     displayMessage("teammate hasCenterMasochist: true",1);
                   }
                   else if(PerksUIData.teammateCardDataA[i].clipName == "Tormentor")
                   {
                      this.hasTormentor = true;
-                     displayMessage("hasTormentor: " + this.hasTormentor,1);
+                     displayMessage("teammate hasTormentor: true",1);
                   }
                }
                i++;
@@ -666,7 +669,7 @@ package
             return;
          }
          displayMessage("TargetChanged",2);
-         setTimeout(this.setPriority,20);
+         setTimeout(this.setPriority,config.delayPriorityChecking);
       }
       
       public function setPriority(logMsg:Boolean = true) : void
