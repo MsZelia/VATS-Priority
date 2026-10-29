@@ -43,6 +43,8 @@ package
       
       public static var DISABLED:Boolean = false;
       
+      private static const RECHECK_PARTS_MIN_ms:uint = 500;
+      
       private static const HUDTOOLS_MENU_ENABLE:String = MOD_NAME + "_ENABLE";
       
       private static const HUDTOOLS_MENU_DISABLE:String = MOD_NAME + "_DISABLE";
@@ -81,9 +83,13 @@ package
       
       private var opacityTimer:Timer = new Timer(20);
       
-      private var crippleTimer:Timer = new Timer(50);
+      private var recheckTimer:Timer = new Timer(50);
       
       private var lastLimbHP:int = 0;
+      
+      private var lastPartName:String = "";
+      
+      private var lastPartPick:Number = 0;
       
       public function VatsPriority()
       {
@@ -93,7 +99,7 @@ package
          this.PerksUIData = BSUIDataManager.GetDataFromClient("PerksUIData").data;
          this.HUDModeData = BSUIDataManager.GetDataFromClient("HUDModeData").data;
          this.opacityTimer.addEventListener(TimerEvent.TIMER,this.setOpacity);
-         this.crippleTimer.addEventListener(TimerEvent.TIMER,this.checkCrippleState);
+         this.recheckTimer.addEventListener(TimerEvent.TIMER,this.recheckParts);
       }
       
       public static function toString(param1:Object) : String
@@ -318,9 +324,13 @@ package
                         }
                      }
                      config.delayPriorityChecking = isNaN(config.delayPriorityChecking) ? DEFAULT_DELAY : Math.max(config.delayPriorityChecking,DEFAULT_DELAY);
-                     if(!isHUDMenu && Boolean(config.recheckPrioritiesOnLimbCripple))
+                     if(config.recheckPrioritiesPeriod_ms)
                      {
-                        crippleTimer.start();
+                        config.recheckPrioritiesPeriod_ms = Math.max(config.recheckPrioritiesPeriod_ms, RECHECK_PARTS_MIN_ms);
+                     }
+                     if(!isHUDMenu && (Boolean(config.recheckPrioritiesOnLimbCripple) || Boolean(config.recheckPrioritiesPeriod_ms)))
+                     {
+                        recheckTimer.start();
                      }
                      displayMessage(FULL_MOD_NAME + " | Config file loaded!",1);
                      displayMessage(toString(config),3);
@@ -433,10 +443,10 @@ package
             this.opacityTimer.stop();
             this.opacityTimer.removeEventListener(TimerEvent.TIMER,this.setOpacity);
          }
-         if(this.crippleTimer)
+         if(this.recheckTimer)
          {
-            this.crippleTimer.stop();
-            this.crippleTimer.removeEventListener(TimerEvent.TIMER,this.checkCrippleState);
+            this.recheckTimer.stop();
+            this.recheckTimer.removeEventListener(TimerEvent.TIMER,this.recheckParts);
          }
          if(this.hudTools)
          {
@@ -686,9 +696,25 @@ package
          setTimeout(this.setPriority,config.delayPriorityChecking);
       }
       
-      public function checkCrippleState() : void
+      public function recheckParts() : void
       {
          if(isTargetLocked())
+         {
+            return;
+         }
+         var now:Number = (new Date()).time;
+         if(config.recheckPrioritiesPeriod_ms && (now - this.lastPartPick) > config.recheckPrioritiesPeriod_ms)
+         {
+            this.lastPartPick = now;
+            var currentPart:String = new String(this.lastPartName);
+            this.setPriority(false);
+            if(this.lastPartName != currentPart)
+            {
+               displayMessage("Picked a new part: " + this.lastPartName,1);
+               return;
+            }
+         }
+         if(!config.recheckPrioritiesOnLimbCripple)
          {
             return;
          }
@@ -748,7 +774,6 @@ package
             }
          }
          var foundTarget:Boolean = false;
-         var foundPart:Boolean = false;
          for(prioTarget in config.priorities)
          {
             if(config.priorities[prioTarget] != null)
@@ -785,14 +810,11 @@ package
                                  displayMessage("Found part " + parts[part] + ", id: " + part,1);
                               }
                               this.topLevel.BGSCodeObj.SelectPart(part);
-                              foundPart = true;
-                              break;
+                              this.lastPartName = parts[part];
+                              this.lastPartPick = (new Date()).time;
+                              return;
                            }
                         }
-                     }
-                     if(foundPart)
-                     {
-                        break;
                      }
                   }
                   if(foundTarget)
@@ -802,7 +824,7 @@ package
                }
             }
          }
-         if(!foundPart)
+         if(true)
          {
             for each(altPriority in config.defaultPriority)
             {
@@ -817,14 +839,11 @@ package
                            displayMessage("Default priority, selecting part " + parts[part] + ", id: " + part,1);
                         }
                         this.topLevel.BGSCodeObj.SelectPart(part);
-                        foundPart = true;
-                        break;
+                        this.lastPartName = parts[part];
+                        this.lastPartPick = (new Date()).time;
+                        return;
                      }
                   }
-               }
-               if(foundPart)
-               {
-                  break;
                }
             }
          }

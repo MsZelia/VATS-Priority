@@ -33,6 +33,11 @@
 	
 	"recheckPrioritiesOnLimbCripple": true, // options: false, true, "hasTormentor"
 	
+	// Rechecks selected part every x milliseconds.
+	// Options: false or number of milliseconds.
+	// Fastest value is 500ms. Smaller values will be rounded up.
+	"recheckPrioritiesPeriod_ms": false,
+	
 	"defaultPriority": [
 		{"partName": "HEAD", "minHitChance": 1},
 		{"partName": "TORSO", "hasCenterMasochist": true, "minHitChance": 1},
